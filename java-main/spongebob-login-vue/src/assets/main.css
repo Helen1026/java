@@ -1,0 +1,241 @@
+:root {
+  --sponge-yellow: #FDE047;
+  --sponge-deep: #FACC15;
+  --ocean-top: #7DD3FC;
+  --ocean-bottom: #0369A1;
+  --brown-pants: #8B5A2B;
+  --sea-green: #2DD4BF;
+  --coral: #FB7185;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "Comic Sans MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+#app {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--ocean-top) 0%, var(--ocean-bottom) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== 上升气泡 ===== */
+.bubble {
+  position: absolute;
+  bottom: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.15));
+  animation: rise linear infinite;
+  opacity: .7;
+  pointer-events: none;
+}
+@keyframes rise {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: .7; }
+  100% { transform: translateY(-110vh) translateX(30px) scale(1.2); opacity: 0; }
+}
+
+/* ===== 海底装饰 ===== */
+.sand {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 90px;
+  background: linear-gradient(180deg, #FDE68A, #D9A441);
+  border-radius: 50% 50% 0 0 / 40px 40px 0 0;
+  z-index: 0;
+}
+.seaweed {
+  position: absolute;
+  bottom: 60px;
+  width: 14px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #34D399, #059669);
+  animation: sway 4s ease-in-out infinite alternate;
+  transform-origin: bottom center;
+  z-index: 0;
+}
+@keyframes sway {
+  from { transform: rotate(-6deg); }
+  to   { transform: rotate(6deg); }
+}
+.flower-cloud {
+  position: absolute;
+  border-radius: 50%;
+  border: 6px solid rgba(255,255,255,.5);
+  pointer-events: none;
+}
+
+/* ===== 登录 / 注册卡片共享样式（风格统一） ===== */
+.login-card {
+  position: relative;
+  z-index: 2;
+  width: 380px;
+  max-width: 92vw;
+  background: linear-gradient(160deg, var(--sponge-yellow), var(--sponge-deep));
+  border-radius: 28px;
+  padding: 40px 36px 32px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.3), inset 0 -6px 0 rgba(0,0,0,.08);
+  border: 4px solid #FBBF24;
+}
+.hole {
+  position: absolute;
+  background: rgba(202, 138, 4, .35);
+  border-radius: 50%;
+  box-shadow: inset 2px 3px 5px rgba(0,0,0,.15);
+}
+
+.login-card h1 {
+  text-align: center;
+  color: #7C2D12;
+  font-size: 26px;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+.login-card .subtitle {
+  text-align: center;
+  color: #92400E;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.field { margin-bottom: 18px; position: relative; }
+.field label {
+  display: block;
+  font-size: 13px;
+  color: #7C2D12;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+.field input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border: 3px solid #F59E0B;
+  border-radius: 14px;
+  background: #FFFBEB;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  color: #78350F;
+  font-family: inherit;
+}
+.field input:focus {
+  border-color: var(--sea-green);
+  box-shadow: 0 0 0 4px rgba(45,212,191,.25);
+}
+.field .icon {
+  position: absolute;
+  left: 12px;
+  top: 34px;
+  font-size: 17px;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #92400E;
+  margin-bottom: 20px;
+}
+.options a { color: #0369A1; text-decoration: none; font-weight: bold; }
+.options a:hover { text-decoration: underline; }
+.options input[type="checkbox"] { accent-color: #059669; }
+
+.btn-login {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #34D399, #059669);
+  color: #fff;
+  font-size: 17px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #047857;
+  transition: transform .1s, box-shadow .1s, filter .2s;
+  font-family: inherit;
+}
+.btn-login:hover { filter: brightness(1.05); }
+.btn-login:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #047857;
+}
+.btn-login:disabled {
+  filter: grayscale(.4);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 5px 0 #047857;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13px;
+  color: #92400E;
+}
+.register-link a { color: #0369A1; font-weight: bold; text-decoration: none; }
+.register-link a:hover { text-decoration: underline; }
+
+.error-msg {
+  display: none;
+  background: #FEE2E2;
+  border: 2px solid var(--coral);
+  color: #B91C1C;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.error-msg.show { display: block; }
+
+/* ===== 密码规则提示 ===== */
+.pwd-rules {
+  list-style: none;
+  margin: -8px 0 18px;
+  padding: 10px 14px;
+  background: rgba(255, 251, 235, .65);
+  border: 2px dashed #F59E0B;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #92400E;
+}
+.pwd-rules li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.9;
+  transition: color .2s;
+}
+.pwd-rules li::before {
+  content: "🫧";
+  font-size: 11px;
+}
+.pwd-rules li.pass {
+  color: #047857;
+  font-weight: bold;
+}
+.pwd-rules li.pass::before {
+  content: "✅";
+}
+
+/* ===== 验证码行 ===== */
+.captcha-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.captcha-row input {
+  flex: 1;
+  min-width: 0;
+}
+.captcha-tip {
+  font-size: 12px;
+  color: #B45309;
+  margin: -10px 0 18px;
+}

@@ -239,3 +239,350 @@ body {
   color: #B45309;
   margin: -10px 0 18px;
 }
+
+/* ==========================================================================
+   子页面共享样式：PageShell（导航 / 标题 / 页脚 / 轻提示）与页面通用组件
+   用于 水母田、蟹堡王、菠萝屋、关于比奇堡
+   ========================================================================== */
+
+/* ===== 页面骨架：铺满屏幕、内部滚动（背景气泡与海底装饰来自 App.vue） ===== */
+.page-root {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ===== 导航栏 ===== */
+.seabed-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 251, 235, .92);
+  backdrop-filter: blur(8px);
+  border-bottom: 3px solid #FBBF24;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+.seabed-nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.seabed-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: bold;
+  color: #7C2D12;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.seabed-brand-icon {
+  display: inline-block;
+  font-size: 24px;
+  animation: seabed-bob 2.6s ease-in-out infinite;
+}
+@keyframes seabed-bob {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50%      { transform: translateY(-5px) rotate(6deg); }
+}
+.seabed-links {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.seabed-link {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #92400E;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .2s, color .2s, transform .1s;
+}
+.seabed-link:hover {
+  background: #FEF3C7;
+  transform: translateY(-1px);
+}
+.seabed-link.active {
+  background: linear-gradient(180deg, #34D399, #059669);
+  color: #fff;
+  box-shadow: 0 3px 0 #047857;
+}
+.seabed-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.seabed-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 160px;
+  padding: 6px 14px;
+  background: #FFFBEB;
+  border: 2px solid #FBBF24;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #7C2D12;
+}
+.seabed-chip span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.seabed-logout {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #FB7185, #E11D48);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #9F1239;
+  transition: transform .1s, box-shadow .1s, filter .2s;
+}
+.seabed-logout:hover { filter: brightness(1.06); }
+.seabed-logout:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #9F1239;
+}
+
+/* ===== 标题区 ===== */
+.page-hero {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 20px 8px;
+  text-align: center;
+}
+.page-hero h1 {
+  color: #fff;
+  font-size: 34px;
+  letter-spacing: 3px;
+  text-shadow: 0 3px 0 rgba(3, 105, 161, .55), 0 8px 20px rgba(0, 0, 0, .28);
+}
+.page-sub {
+  margin-top: 12px;
+  color: #E0F2FE;
+  font-size: 14px;
+  line-height: 1.8;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .22);
+}
+
+/* ===== 主体内容区 ===== */
+.page-content {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 26px 20px 20px;
+}
+
+/* ===== 页脚 ===== */
+.page-footer {
+  padding: 20px 20px 100px;
+  color: rgba(224, 242, 254, .9);
+  font-size: 12px;
+  text-align: center;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+}
+
+/* ===== 轻提示 ===== */
+.page-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 46px;
+  z-index: 100;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  max-width: 88vw;
+  background: rgba(124, 45, 18, .94);
+  border-radius: 999px;
+  color: #FEF3C7;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .32);
+}
+.page-toast-fade-enter-active,
+.page-toast-fade-leave-active {
+  transition: opacity .25s ease, transform .25s ease;
+}
+.page-toast-fade-enter-from,
+.page-toast-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(14px);
+}
+
+/* ===== 通用面板（米白底 + 虚线边框） ===== */
+.panel {
+  padding: 20px;
+  background: rgba(255, 251, 235, .95);
+  border: 3px dashed #F59E0B;
+  border-radius: 22px;
+  color: #92400E;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #7C2D12;
+  font-size: 17px;
+  letter-spacing: 1px;
+}
+.panel-title .panel-extra {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: normal;
+  color: #B45309;
+}
+
+/* ===== 通用卡片（海绵黄） ===== */
+.pcard {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  background: linear-gradient(160deg, #FDE047, #FACC15);
+  border: 4px solid #FBBF24;
+  border-radius: 22px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .22), inset 0 -6px 0 rgba(0, 0, 0, .07);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.pcard.hoverable { cursor: pointer; }
+.pcard.hoverable:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, .28), inset 0 -6px 0 rgba(0, 0, 0, .07);
+}
+.pcard-icon {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .18));
+}
+.pcard-title {
+  margin: 10px 0 6px;
+  color: #7C2D12;
+  font-size: 17px;
+  letter-spacing: 1px;
+}
+.pcard-desc {
+  color: #92400E;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.pcard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* ===== 通用小标签 ===== */
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(255, 251, 235, .9);
+  border: 2px solid #F59E0B;
+  border-radius: 999px;
+  color: #B45309;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* ===== 通用按钮 ===== */
+.btn-sea,
+.btn-amber,
+.btn-coral {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform .1s, box-shadow .1s, filter .2s;
+}
+.btn-sea {
+  background: linear-gradient(180deg, #34D399, #059669);
+  color: #fff;
+  box-shadow: 0 4px 0 #047857;
+}
+.btn-amber {
+  background: #FFFBEB;
+  border: 2px solid #FBBF24;
+  color: #92400E;
+  box-shadow: 0 4px 0 #FDE68A;
+}
+.btn-coral {
+  background: linear-gradient(180deg, #FB7185, #E11D48);
+  color: #fff;
+  box-shadow: 0 4px 0 #9F1239;
+}
+.btn-sea:hover,
+.btn-amber:hover,
+.btn-coral:hover { filter: brightness(1.05); }
+.btn-sea:active,
+.btn-amber:active,
+.btn-coral:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .15);
+}
+.btn-sea:disabled,
+.btn-amber:disabled,
+.btn-coral:disabled {
+  filter: grayscale(.45);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===== 空状态 ===== */
+.empty-box {
+  padding: 40px 20px;
+  background: rgba(255, 251, 235, .93);
+  border: 3px dashed #F59E0B;
+  border-radius: 22px;
+  color: #92400E;
+  font-size: 14px;
+  text-align: center;
+  line-height: 2;
+}
+
+/* ===== 子页面小屏适配 ===== */
+@media (max-width: 640px) {
+  .seabed-nav-inner {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+  .seabed-links {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .seabed-right { margin-left: auto; }
+  .page-hero { padding-top: 26px; }
+  .page-hero h1 {
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+  .pcard-grid { grid-template-columns: 1fr; }
+}

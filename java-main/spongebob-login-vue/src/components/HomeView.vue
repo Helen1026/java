@@ -11,9 +11,9 @@
         <nav class="nav-links">
           <button
             v-for="item in navItems"
-            :key="item.name"
+            :key="item.to"
             class="nav-link"
-            :class="{ active: item.active }"
+            :class="{ active: route.path === item.to }"
             @click="goPage(item)"
           >
             {{ item.name }}
@@ -166,6 +166,7 @@
 
     <footer class="home-footer">
       比奇堡登录系统 · 首页已接入后端（搜索 / 热门推荐 / 分级分类均可直连 springBootTest）
+      · 水母田、蟹堡王、菠萝屋、关于比奇堡均已上线
     </footer>
 
     <!-- ===== 全局轻提示 ===== -->
@@ -177,18 +178,19 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { searchApi, recommendApi, categoriesApi, HOT_KEYWORDS } from '../api/home'
 
 const router = useRouter()
+const route = useRoute()
 
-/** 导航项（除首页外，其他页面暂时只做提示，后续再开发） */
+/** 全站导航（与 PageShell 保持一致），点击即路由跳转 */
 const navItems = [
-  { name: '首页', active: true },
-  { name: '水母田', active: false },
-  { name: '蟹堡王', active: false },
-  { name: '菠萝屋', active: false },
-  { name: '关于比奇堡', active: false },
+  { name: '首页', to: '/home' },
+  { name: '水母田', to: '/jellyfish' },
+  { name: '蟹堡王', to: '/krusty-krab' },
+  { name: '菠萝屋', to: '/pineapple' },
+  { name: '关于比奇堡', to: '/about' },
 ]
 
 /** 卡片上的海绵孔洞装饰（与登录页风格统一） */
@@ -336,8 +338,8 @@ function clearSearch() {
 }
 
 function goPage(item) {
-  if (item.active) return
-  showToast('「' + item.name + '」还在打捞中，先逛逛首页吧～')
+  if (route.path === item.to) return
+  router.push(item.to)
 }
 
 function logout() {

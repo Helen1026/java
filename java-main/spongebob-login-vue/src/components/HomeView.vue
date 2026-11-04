@@ -109,7 +109,7 @@
             v-for="item in results"
             :key="item.id"
             class="item-card"
-            @click="searchHot(item.title)"
+            @click="goDetail(item.id)"
           >
             <div
               v-for="(h, i) in holes"
@@ -144,7 +144,7 @@
             v-for="item in recommended"
             :key="item.id"
             class="item-card"
-            @click="searchHot(item.title)"
+            @click="goDetail(item.id)"
           >
             <div
               v-for="(h, i) in holes"
@@ -341,6 +341,11 @@ function clearSearch() {
 function goPage(item) {
   if (route.path === item.to) return
   router.push(item.to)
+}
+
+/** 点击商品卡片 → 跳转到商品详情页 */
+function goDetail(id) {
+  router.push(`/item/${id}`)
 }
 
 function goAdmin() {

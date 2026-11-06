@@ -21,6 +21,7 @@
         </nav>
 
         <div class="seabed-right">
+          <CartButton />
           <div class="seabed-chip" :title="nickname">
             <span>{{ avatar }}</span>
             <span>{{ nickname }}</span>
@@ -56,6 +57,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import CartButton from './CartButton.vue'
 
 defineProps({
   /** 页面主标题 */

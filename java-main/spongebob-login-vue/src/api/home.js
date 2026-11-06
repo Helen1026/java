@@ -23,7 +23,14 @@ export async function searchApi(keyword = '', categoryId = null) {
     const params = {}
     if (keyword && keyword.trim()) params.keyword = keyword.trim()
     if (categoryId && categoryId > 0) params.categoryId = categoryId
-    return await request.get('/home/search', { params })
+    const res = await request.get('/home/search', { params })
+    // 后端连得上但命中为空（例如数据库还没导入演示商品）→ 回退本地演示数据，
+    // 保证首页热门搜索 / 关键词搜索始终有内容，而不是一片空白。
+    if (!res || !res.data || res.data.length === 0) {
+      console.warn('[home] /home/search 命中为空，回退本地演示数据：', keyword)
+      return localSearch(keyword, categoryId)
+    }
+    return res
   } catch (err) {
     console.warn('[home] /home/search 暂不可用，先用本地数据展示：', err.message)
     return localSearch(keyword, categoryId)
@@ -32,12 +39,12 @@ export async function searchApi(keyword = '', categoryId = null) {
 
 /** 首页热门推荐 */
 export async function recommendApi() {
-  if (USE_MOCK) return localResult(SEARCH_POOL.slice(0, 4))
+  if (USE_MOCK) return localResult(localRecommend())
   try {
     return await request.get('/home/recommend')
   } catch (err) {
     console.warn('[home] /home/recommend 暂不可用，先用本地数据展示：', err.message)
-    return localResult(SEARCH_POOL.slice(0, 4))
+    return localResult(localRecommend())
   }
 }
 
@@ -53,7 +60,7 @@ export async function categoriesApi() {
 }
 
 /** 热门搜索词 */
-export const HOT_KEYWORDS = ['蟹黄堡', '水母', '泡泡', '派大星', '美食', '神奇', '珊迪', '章鱼哥']
+export const HOT_KEYWORDS = ['蟹黄堡', '水母', '泡泡', '派大星', '美食', '神奇', '珊迪', '章鱼哥', '美妆', '数码', '食材', '运动']
 
 // ===== 本地兜底数据（后端未就绪时使用） =====
 
@@ -93,6 +100,22 @@ const LOCAL_CATEGORY_TREE = [
     { id: 81, name: '漫画杂志', level: 2, children: [] },
     { id: 82, name: '教科书', level: 2, children: [] },
   ]},
+  { id: 9, name: '美妆护理', level: 1, children: [
+    { id: 91, name: '护肤', level: 2, children: [] },
+    { id: 92, name: '香氛', level: 2, children: [] },
+  ]},
+  { id: 10, name: '科技数码', level: 1, children: [
+    { id: 101, name: '智能设备', level: 2, children: [] },
+    { id: 102, name: '影音娱乐', level: 2, children: [] },
+  ]},
+  { id: 14, name: '生鲜食材', level: 1, children: [
+    { id: 141, name: '蟹堡原料', level: 2, children: [] },
+    { id: 142, name: '海产鲜货', level: 2, children: [] },
+  ]},
+  { id: 15, name: '运动户外', level: 1, children: [
+    { id: 151, name: '水上运动', level: 2, children: [] },
+    { id: 152, name: '健身器材', level: 2, children: [] },
+  ]},
 ]
 
 /** id -> 分类名，便于本地模式下给卡片补上分类名 */
@@ -105,6 +128,10 @@ const LOCAL_CAT_NAME = {
   6: '服饰', 61: '日常穿搭', 62: '运动装备',
   7: '家居', 71: '菠萝屋装饰', 72: '厨房用品',
   8: '书籍', 81: '漫画杂志', 82: '教科书',
+  9: '美妆护理', 91: '护肤', 92: '香氛',
+  10: '科技数码', 101: '智能设备', 102: '影音娱乐',
+  14: '生鲜食材', 141: '蟹堡原料', 142: '海产鲜货',
+  15: '运动户外', 151: '水上运动', 152: '健身器材',
 }
 
 /** 本地演示数据池：比奇堡主题，categoryId 与上面的分类树对应 */
@@ -167,6 +194,30 @@ const SEARCH_POOL = [
   { id: 41, icon: '📚', title: '比奇堡漫画周刊', desc: '每周三出版，章鱼哥是忠实读者', tag: '书籍', hot: 444, categoryId: 81 },
   { id: 42, icon: '📖', title: '水母捕捞指南', desc: '从入门到精通，派大星看了三遍还是不会', tag: '书籍', hot: 333, categoryId: 82 },
   { id: 43, icon: '📓', title: '章鱼哥的忧伤日记', desc: '记录了每一天的不开心，请勿在公共场合阅读', tag: '书籍', hot: 222, categoryId: 82 },
+
+  // === 美妆护理 ===
+  { id: 44, icon: '🧴', title: '海藻保湿霜', desc: '珊迪实验室出品，抹上像刚出水的海带一样水润', tag: '美妆', hot: 444, categoryId: 91 },
+  { id: 45, icon: '💅', title: '贝壳指甲油', desc: '七彩贝壳色，涂完手指会发光', tag: '美妆', hot: 222, categoryId: 91 },
+  { id: 46, icon: '🌸', title: '海葵香水', desc: '前调海盐，后调海葵，章鱼哥说有点过于浪漫', tag: '美妆', hot: 333, categoryId: 92 },
+  { id: 47, icon: '🕯️', title: '比奇堡香薰', desc: '点燃后整个菠萝屋都是蟹黄堡的香味（假的）', tag: '香氛', hot: 111, categoryId: 92 },
+
+  // === 科技数码 ===
+  { id: 48, icon: '🤖', title: '蟹堡机器人', desc: '自动煎蟹黄堡，蟹老板又爱又恨', tag: '数码', hot: 777, categoryId: 101 },
+  { id: 49, icon: '⌚', title: '泡泡智能手环', desc: '测心率、计步，还能提醒你该去抓水母了', tag: '数码', hot: 555, categoryId: 101 },
+  { id: 50, icon: '📺', title: '海底电视', desc: '能收到比奇堡所有频道，包括章鱼哥的诗朗诵', tag: '数码', hot: 333, categoryId: 102 },
+  { id: 51, icon: '🎮', title: '水母控制器', desc: '用手柄就能指挥水母跳舞，派大星沉迷', tag: '数码', hot: 222, categoryId: 102 },
+
+  // === 生鲜食材 ===
+  { id: 52, icon: '🥬', title: '神秘酱料瓶', desc: '蟹黄堡的灵魂，配方全球仅海绵宝宝一人知晓', tag: '食材', hot: 666, categoryId: 141 },
+  { id: 53, icon: '🍞', title: '海藻面包胚', desc: '松软得像云朵，蟹堡王每日现烤', tag: '食材', hot: 333, categoryId: 141 },
+  { id: 54, icon: '🦐', title: '深海小虾', desc: '活蹦乱跳，珊迪说富含优质蛋白', tag: '食材', hot: 222, categoryId: 142 },
+  { id: 55, icon: '🐚', title: '鲜贝柱', desc: '比奇堡特产，清甜弹牙', tag: '食材', hot: 111, categoryId: 142 },
+
+  // === 运动户外 ===
+  { id: 56, icon: '🏄', title: '海绵冲浪板', desc: '踩上去稳如菠萝屋，派大星也能站稳', tag: '运动', hot: 444, categoryId: 151 },
+  { id: 57, icon: '🤿', title: '深海潜水面罩', desc: '看清水母田里每一只发光水母', tag: '运动', hot: 222, categoryId: 151 },
+  { id: 58, icon: '🏋️', title: '蟹钳哑铃', desc: '一边举一边夹，练出蟹老板同款手臂', tag: '运动', hot: 111, categoryId: 152 },
+  { id: 59, icon: '🧘', title: '海草瑜伽垫', desc: '铺在珊瑚上也能做平衡术，珊迪推荐', tag: '运动', hot: 99, categoryId: 152 },
 ]
 
 /** 计算某分类及其所有后代分类的 id 集合（分级分类） */
@@ -198,6 +249,40 @@ function localSearch(keyword, categoryId) {
     categoryName: LOCAL_CAT_NAME[item.categoryId] || item.tag,
   }))
   return localResult(list)
+}
+
+/**
+ * 本地热门推荐：每个一级分类取热度最高的若干件（默认 2 件），
+ * 让「今日热门推荐」覆盖更多商品种类，而不是只堆几个爆款。
+ */
+function localRecommend(perCat = 2) {
+  const picked = []
+  const seen = new Set()
+  for (const node of LOCAL_CATEGORY_TREE) {
+    const catIds = new Set([node.id])
+    if (node.children) node.children.forEach((c) => catIds.add(c.id))
+    const top = SEARCH_POOL
+      .filter((it) => catIds.has(it.categoryId))
+      .sort((a, b) => b.hot - a.hot)
+      .slice(0, perCat)
+    for (const it of top) {
+      if (!seen.has(it.id)) {
+        picked.push(it)
+        seen.add(it.id)
+      }
+    }
+  }
+  // 兜底：分类不足时，用全局热度补足
+  if (picked.length < 12) {
+    SEARCH_POOL.slice().sort((a, b) => b.hot - a.hot).forEach((it) => {
+      if (picked.length >= 12) return
+      if (!seen.has(it.id)) {
+        picked.push(it)
+        seen.add(it.id)
+      }
+    })
+  }
+  return picked.map((it) => ({ ...it, categoryName: LOCAL_CAT_NAME[it.categoryId] || it.tag }))
 }
 
 function localResult(list, delay = 300) {

@@ -99,9 +99,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageShell from './PageShell.vue'
 import { searchApi } from '../api/home'
+import { useCart } from '../cart'
 
 const route = useRoute()
 const router = useRouter()
+const { add: addToCart } = useCart()
 
 const item = ref(null)
 const loading = ref(true)
@@ -160,11 +162,15 @@ function showToast(msg) {
 }
 
 function buyNow() {
+  if (!item.value) return
+  addToCart(item.value)
   showToast(`已下单「${item.value.title}」！蟹老板开心数钱中～`)
 }
 
 function addCart() {
-  showToast(`「${item.value.title}」已加入购物车`)
+  if (!item.value) return
+  addToCart(item.value)
+  showToast(`「${item.value.title}」已加入购物车 🛒`)
 }
 
 function goBack() {

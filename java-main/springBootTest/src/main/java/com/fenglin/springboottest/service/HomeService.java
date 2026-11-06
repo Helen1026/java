@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,12 +57,36 @@ public class HomeService {
     }
 
     /**
-     * 首页热门推荐：取 status=1 中热度最高的 8 条。
+     * 首页热门推荐：每个一级分类取热度最高的若干件（默认 2 件），
+     * 让「今日热门」覆盖尽可能多的商品种类，而不是只堆几个爆款。
      */
     public List<ItemVO> recommend() {
-        LambdaQueryWrapper<Item> q = new LambdaQueryWrapper<>();
-        q.eq(Item::getStatus, 1).orderByDesc(Item::getHot).last("LIMIT 8");
-        return toVO(itemService.list(q));
+        List<CategoryNode> tree = categoryService.tree();
+        List<Item> result = new ArrayList<>();
+        Set<Long> used = new HashSet<>();
+        int perCat = 2;
+        for (CategoryNode node : tree) {
+            List<Long> ids = new ArrayList<>();
+            ids.add(node.getId());
+            if (node.getChildren() != null) {
+                for (CategoryNode c : node.getChildren()) ids.add(c.getId());
+            }
+            LambdaQueryWrapper<Item> q = new LambdaQueryWrapper<>();
+            q.eq(Item::getStatus, 1)
+             .in(Item::getCategoryId, ids)
+             .orderByDesc(Item::getHot)
+             .last("LIMIT " + perCat);
+            for (Item it : itemService.list(q)) {
+                if (used.add(it.getId())) result.add(it);
+            }
+        }
+        // 兜底：分类为空时退回全局热度前 12
+        if (result.isEmpty()) {
+            LambdaQueryWrapper<Item> q = new LambdaQueryWrapper<>();
+            q.eq(Item::getStatus, 1).orderByDesc(Item::getHot).last("LIMIT 12");
+            result.addAll(itemService.list(q));
+        }
+        return toVO(result);
     }
 
     /**

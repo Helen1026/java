@@ -21,6 +21,7 @@
         </nav>
 
         <div class="nav-right">
+          <CartButton />
           <button class="btn-admin" @click="goAdmin">🔐 后台管理</button>
           <div class="user-chip" :title="nickname">
             <span>🧽</span>
@@ -181,6 +182,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { searchApi, recommendApi, categoriesApi, HOT_KEYWORDS } from '../api/home'
+import CartButton from './CartButton.vue'
 
 const router = useRouter()
 const route = useRoute()

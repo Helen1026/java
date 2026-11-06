@@ -113,9 +113,22 @@ const jellyfish = [
   { id: 6, icon: '✨', name: '星光水母', rarity: '稀有', difficulty: 4, color: '#E9D5FF', desc: '夜里会拼出星座图案，只在满月那几天浮上来。' },
   { id: 7, icon: '🔮', name: '水晶水母', rarity: '传说', difficulty: 5, color: '#C7D2FE', desc: '透明的身体能映出三秒后的未来，派大星说看到了蟹黄堡。' },
   { id: 8, icon: '👑', name: '水母女王', rarity: '传说', difficulty: 5, color: '#FDE68A', desc: '传说里统领整片水母田的女王，亲眼见过的人不足三个。' },
+  // —— 以下为新增种类，丰富图鉴 ——
+  { id: 9, icon: '🟡', name: '柠檬水母', rarity: '常见', difficulty: 1, color: '#FEF08A', desc: '酸酸甜甜的小水母，派大星说它闻起来像被太阳晒过的泡泡。' },
+  { id: 10, icon: '🍃', name: '苔藓水母', rarity: '常见', difficulty: 2, color: '#BBF7D0', desc: '总爱趴在礁石上装苔藓，一碰就“噗”地弹开。' },
+  { id: 11, icon: '🐟', name: '小鱼水母', rarity: '常见', difficulty: 2, color: '#A7F3D0', desc: '长得像一条迷路的小鱼，其实是个社恐水母。' },
+  { id: 12, icon: '🔥', name: '焰心水母', rarity: '稀有', difficulty: 3, color: '#FCA5A5', desc: '身体里封着一小团海底火山的热度，靠近能暖手。' },
+  { id: 13, icon: '🌀', name: '漩涡水母', rarity: '稀有', difficulty: 4, color: '#67E8F9', desc: '自带迷你洋流，抓它会被带着转三圈才停。' },
+  { id: 14, icon: '🌿', name: '海草水母', rarity: '稀有', difficulty: 3, color: '#86EFAC', desc: '身上缠满会发光的小海草，珊迪拿它当夜灯。' },
+  { id: 15, icon: '💎', name: '宝石水母', rarity: '稀有', difficulty: 4, color: '#C4B5FD', desc: '半透明的身体里像镶了碎钻，蟹老板出高价收。' },
+  { id: 16, icon: '🌟', name: '极光水母', rarity: '传说', difficulty: 5, color: '#A7F3D0', desc: '只有连续三个无月之夜才会出现，拖出一条极光尾巴。' },
+  { id: 17, icon: '🦑', name: '墨玉水母', rarity: '传说', difficulty: 5, color: '#6B7280', desc: '通体乌黑发亮，章鱼哥说它像极了他失恋那晚的画。' },
+  { id: 18, icon: '🐉', name: '龙王水母', rarity: '神话', difficulty: 5, color: '#FBBF24', desc: '传说中水母田的守护神，被它点过名的人会好运一整年。' },
+  { id: 19, icon: '👁️', name: '虚空水母', rarity: '神话', difficulty: 5, color: '#A78BFA', desc: '几乎没人见过全貌，只偶尔飘过一只眼睛形状的影子。' },
+  { id: 20, icon: '🌈', name: '虹光水母', rarity: '神话', difficulty: 5, color: '#F9A8D4', desc: '游过之处留下一道彩虹，孩子们追着它跑过整个比奇堡。' },
 ]
 
-const RARITY_FILTERS = ['全部', '常见', '稀有', '传说']
+const RARITY_FILTERS = ['全部', '常见', '稀有', '传说', '神话']
 
 const rarity = ref('全部')
 const basket = ref([])
@@ -294,6 +307,7 @@ function keepAll() {
 .r-常见 { border-color: #34D399; color: #047857; }
 .r-稀有 { border-color: #3B82F6; color: #1D4ED8; }
 .r-传说 { border-color: #F59E0B; color: #B45309; }
+.r-神话 { border-color: #D946EF; color: #A21CAF; background: rgba(217, 70, 239, .08); }
 
 .caught-badge {
   position: absolute;

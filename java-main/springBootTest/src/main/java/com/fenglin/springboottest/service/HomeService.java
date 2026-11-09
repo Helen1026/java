@@ -64,7 +64,7 @@ public class HomeService {
         List<CategoryNode> tree = categoryService.tree();
         List<Item> result = new ArrayList<>();
         Set<Long> used = new HashSet<>();
-        int perCat = 2;
+        int perCat = 4;
         for (CategoryNode node : tree) {
             List<Long> ids = new ArrayList<>();
             ids.add(node.getId());

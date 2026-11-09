@@ -90,6 +90,52 @@
       </div>
     </section>
 
+    <!-- ===== 横幅 + 天气 + 小统计 ===== -->
+    <section class="highlights">
+      <!-- 欢迎横幅 -->
+      <div class="welcome-banner">
+        <div class="welcome-icon">🧽</div>
+        <div class="welcome-text">
+          <h2>嗨，{{ nickname }}！欢迎回到比奇堡</h2>
+          <p>今天也适合抓水母、做蟹黄堡～「{{ dailyQuote }}」</p>
+        </div>
+      </div>
+
+      <!-- 比奇堡天气 + 今日小统计 -->
+      <div class="info-row">
+        <div class="weather-card">
+          <div class="weather-top">
+            <span class="weather-icon">{{ weather.icon }}</span>
+            <div class="weather-main">
+              <div class="weather-temp">{{ weather.temp }}°C</div>
+              <div class="weather-label">{{ weather.label }}</div>
+            </div>
+            <div class="weather-date">{{ todayDate }}<br><span class="weather-clock">{{ nowTime }}</span></div>
+          </div>
+          <div class="weather-meta">
+            <span>🌬️ {{ weather.wind }}</span>
+            <span>🌊 {{ weather.tide }} · 浪高 {{ weather.wave }}</span>
+          </div>
+          <p class="weather-tip">{{ weather.tip }}</p>
+        </div>
+
+        <div class="mini-stats">
+          <div class="mini-stat">
+            <span class="mini-num">{{ stats.items }}</span>
+            <span class="mini-label">在售好物</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-num">{{ stats.cats }}</span>
+            <span class="mini-label">商品分类</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-num">{{ recommended.length }}</span>
+            <span class="mini-label">今日推荐</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== 内容区 ===== -->
     <section class="content">
       <!-- 搜索结果 -->
@@ -163,6 +209,25 @@
             </div>
           </article>
         </div>
+
+        <!-- 比奇堡热榜 TOP5（默认视图下基于推荐数据，按热门度取前 5） -->
+        <div class="section-head hotrank-head" v-if="topItems.length">
+          <h2>🔥 比奇堡热榜 TOP5</h2>
+          <span class="section-tip">大家都在搜</span>
+        </div>
+        <ol class="hotrank" v-if="topItems.length">
+          <li
+            v-for="(it, i) in topItems"
+            :key="it.id"
+            class="hotrank-item"
+            @click="goDetail(it.id)"
+          >
+            <span class="rank-no" :class="'rank-' + (i + 1)">{{ i + 1 }}</span>
+            <span class="rank-icon">{{ it.icon }}</span>
+            <span class="rank-title">{{ it.title }}</span>
+            <span class="rank-hot">🔥 {{ it.hot }}</span>
+          </li>
+        </ol>
       </template>
     </section>
 
@@ -179,7 +244,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { searchApi, recommendApi, categoriesApi, HOT_KEYWORDS } from '../api/home'
 import CartButton from './CartButton.vue'
@@ -201,6 +266,66 @@ const holes = [
   { width: '18px', height: '18px', top: '14px', right: '18px' },
   { width: '12px', height: '12px', bottom: '16px', left: '14px' },
 ]
+
+/** 每日一句（加载时随机抽一条，呼应海绵宝宝风格） */
+const DAILY_QUOTES = [
+  '我准备好了！我准备好了！',
+  '派大星说过，最好的朋友就是一起傻傻地笑。',
+  '蟹黄堡要趁热吃，快乐要趁现在。',
+  '章鱼哥在画自画像，我们别去打扰他啦～',
+  '海绵宝宝的一天，从一句「我超开心」开始。',
+  '比奇堡的阳光，是咸咸甜甜的那种。',
+  '抓到水母不算本事，放它们回家才是英雄。',
+  '今天也要元气满满，做最棒的自己呀！',
+]
+const dailyQuote = ref('')
+
+/** 比奇堡天气预设：按日期稳定轮换，每天一种天气 */
+const WEATHER_PRESETS = [
+  { icon: '☀️', label: '晴', temp: 26, wind: '东南风 2级', tide: '涨潮', wave: '0.8m', tip: '阳光正好，适合在礁石上晒蟹黄堡面包！' },
+  { icon: '🌤️', label: '多云', temp: 23, wind: '东风 3级', tide: '平潮', wave: '1.2m', tip: '云朵像棉花糖，派大星说想去上面躺躺。' },
+  { icon: '🌧️', label: '小雨', temp: 20, wind: '北风 2级', tide: '退潮', wave: '0.5m', tip: '退潮啦，去礁石缝里捡贝壳吧～' },
+  { icon: '🌊', label: '大浪', temp: 22, wind: '西风 5级', tide: '涨潮', wave: '2.4m', tip: '浪有点大，冲浪高手章鱼哥上线！' },
+  { icon: '🌈', label: '彩虹', temp: 24, wind: '南风 1级', tide: '平潮', wave: '0.6m', tip: '雨后出现彩虹，比奇堡限定美景！' },
+]
+function pickWeather() {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 0)
+  const dayOfYear = Math.floor((now - start) / 86400000)
+  return WEATHER_PRESETS[dayOfYear % WEATHER_PRESETS.length]
+}
+const weather = ref(pickWeather())
+const todayDate = ref('')
+const nowTime = ref('')
+let clockTimer = null
+function tickClock() {
+  const d = new Date()
+  const pad = (n) => String(n).padStart(2, '0')
+  const week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][d.getDay()]
+  todayDate.value = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${week}`
+  nowTime.value = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
+/** 首页小统计：在售好物 / 商品分类（分类按树形展开计数）/ 今日推荐 */
+const stats = computed(() => {
+  let catCount = 0
+  const walk = (list) => (list || []).forEach((n) => {
+    catCount++
+    if (n.children) walk(n.children)
+  })
+  walk(categories.value)
+  return {
+    items: recommended.value.length,
+    cats: catCount,
+  }
+})
+
+/** 比奇堡热榜 TOP5：按热门度排序取前 5（默认视图下基于推荐数据） */
+const topItems = computed(() =>
+  [...recommended.value]
+    .sort((a, b) => (Number(b.hot) || 0) - (Number(a.hot) || 0))
+    .slice(0, 5),
+)
 
 const keyword = ref('')
 const searched = ref(false)
@@ -265,8 +390,15 @@ onMounted(() => {
   } catch {
     /* 本地信息损坏时用默认昵称 */
   }
+  dailyQuote.value = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]
+  tickClock()
+  clockTimer = setInterval(tickClock, 1000)
   loadRecommend()
   loadCategories()
+})
+
+onBeforeUnmount(() => {
+  if (clockTimer) clearInterval(clockTimer)
 })
 
 async function loadRecommend() {
@@ -820,6 +952,179 @@ function logout() {
 .toast-fade-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(14px);
+}
+
+/* ===== 横幅 + 天气 + 小统计 ===== */
+.highlights {
+  max-width: 1080px;
+  margin: 8px auto 0;
+  padding: 0 20px;
+}
+.welcome-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  background: rgba(255, 251, 235, .95);
+  border: 3px solid #FBBF24;
+  border-radius: 22px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .22), inset 0 -5px 0 rgba(0, 0, 0, .05);
+}
+.welcome-icon {
+  font-size: 40px;
+  line-height: 1;
+  flex-shrink: 0;
+  animation: bob 2.6s ease-in-out infinite;
+}
+.welcome-text h2 {
+  margin: 0;
+  color: #7C2D12;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+.welcome-text p {
+  margin: 6px 0 0;
+  color: #92400E;
+  font-size: 14px;
+}
+
+.info-row {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.weather-card {
+  flex: 1 1 320px;
+  padding: 18px 20px;
+  background: linear-gradient(160deg, rgba(224, 242, 254, .96), rgba(186, 230, 253, .96));
+  border: 3px solid #7DD3FC;
+  border-radius: 22px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .2);
+  color: #075985;
+}
+.weather-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.weather-icon { font-size: 48px; line-height: 1; }
+.weather-main { flex: 1; }
+.weather-temp { font-size: 30px; font-weight: bold; color: #0369A1; line-height: 1; }
+.weather-label { font-size: 14px; font-weight: bold; color: #0C4A6E; }
+.weather-date {
+  text-align: right;
+  font-size: 13px;
+  font-weight: bold;
+  color: #0369A1;
+  line-height: 1.5;
+}
+.weather-clock { font-size: 18px; color: #075985; }
+.weather-meta {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #0C4A6E;
+}
+.weather-tip {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, .6);
+  border-radius: 12px;
+  font-size: 13px;
+  color: #075985;
+}
+
+.mini-stats {
+  flex: 1 1 280px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.mini-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 18px 10px;
+  background: rgba(255, 251, 235, .95);
+  border: 3px solid #FBBF24;
+  border-radius: 18px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .18);
+}
+.mini-num {
+  font-size: 28px;
+  font-weight: bold;
+  color: #B45309;
+  line-height: 1;
+}
+.mini-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #92400E;
+}
+
+/* ===== 比奇堡热榜 TOP5 ===== */
+.hotrank-head { margin-top: 30px; }
+.hotrank {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hotrank-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: rgba(255, 251, 235, .92);
+  border: 2px solid #FDE047;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, background .2s;
+}
+.hotrank-item:hover {
+  transform: translateX(6px);
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .2);
+}
+.rank-no {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+  background: #94A3B8;
+}
+.rank-no.rank-1 { background: linear-gradient(180deg, #F87171, #DC2626); }
+.rank-no.rank-2 { background: linear-gradient(180deg, #FB923C, #EA580C); }
+.rank-no.rank-3 { background: linear-gradient(180deg, #FBBF24, #F59E0B); }
+.rank-icon { font-size: 24px; }
+.rank-title {
+  flex: 1;
+  color: #7C2D12;
+  font-size: 15px;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rank-hot {
+  color: #B91C1C;
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 /* ===== 小屏适配 ===== */

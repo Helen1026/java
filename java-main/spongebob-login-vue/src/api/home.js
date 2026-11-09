@@ -255,7 +255,7 @@ function localSearch(keyword, categoryId) {
  * 本地热门推荐：每个一级分类取热度最高的若干件（默认 2 件），
  * 让「今日热门推荐」覆盖更多商品种类，而不是只堆几个爆款。
  */
-function localRecommend(perCat = 2) {
+function localRecommend(perCat = 4) {
   const picked = []
   const seen = new Set()
   for (const node of LOCAL_CATEGORY_TREE) {

@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 06/11/2026 16:43:06
+ Date: 09/11/2026 11:48:09
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `bb_category`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_parent`(`parent_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 153 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '比奇堡分类（支持多级）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 153 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '比奇堡分类（支持多级）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bb_category
@@ -94,7 +94,7 @@ CREATE TABLE `bb_item`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_category`(`category_id` ASC) USING BTREE,
   INDEX `idx_hot`(`hot` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 60 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '比奇堡条目（蟹黄堡、水母网等）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 84 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '比奇堡条目（蟹黄堡、水母网等）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bb_item
@@ -158,6 +158,30 @@ INSERT INTO `bb_item` VALUES (56, '海绵冲浪板', '🏄', '踩上去稳如菠
 INSERT INTO `bb_item` VALUES (57, '深海潜水面罩', '🤿', '看清水母田里每一只发光水母', '运动', 222, 151, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_item` VALUES (58, '蟹钳哑铃', '🏋️', '一边举一边夹，练出蟹老板同款手臂', '运动', 111, 152, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_item` VALUES (59, '海草瑜伽垫', '🧘', '铺在珊瑚上也能做平衡术，珊迪推荐', '运动', 99, 152, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
+INSERT INTO `bb_item` VALUES (60, '蟹堡王全家桶', '🍱', '一桶装下整个比奇堡的快乐，派大星抱不动', '美食', 3400, 11, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (61, '迷你蟹黄堡礼盒', '🎁', '六只装，一口一只刚好', '美食', 3350, 11, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (62, '彩虹泡泡圈', '🌈', '吹出七色泡泡桥，连接菠萝屋和礁石', '玩具', 1300, 21, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (63, '发光泡泡瓶', '🔦', '夜里能当小夜灯的大泡泡', '玩具', 1200, 21, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (64, '小蜗的围巾', '🧣', '给喵喵叫的小蜗保暖用', '宠物', 1300, 31, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (65, '蜗牛粮', '🌿', '有机海草，小蜗吃了更黏人', '宠物', 1200, 31, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (66, '升级版水母网', '🥅', '网眼更密，派大星再也跑不掉', '工具', 1300, 41, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (67, '水母诱饵', '🪱', '腥味恰到好处，水母无法抗拒', '工具', 1200, 41, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (68, '海螺小号', '🎺', '用海螺做的号，吹响召唤派大星', '乐器', 1300, 51, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (69, '海藻长笛', '🎶', '音色清亮，章鱼哥勉强认可', '乐器', 1200, 51, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (70, '章鱼哥条纹衫', '👔', '优雅蓝绿条纹，章鱼哥同款', '服饰', 1300, 61, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (71, '珊迪宇航服', '🧑‍🚀', '去陆地探险必备，带头盔', '服饰', 1200, 61, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (72, '菠萝灯', '💡', '挂在菠萝屋门口，夜晚暖黄光', '家居', 1300, 71, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (73, '海星摆件', '⭐', '桌上的小海星，会偷偷动', '家居', 1200, 71, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (74, '派大星搞笑集', '📕', '笑点清奇，看不懂但停不下来', '书籍', 1300, 81, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (75, '比奇堡地图册', '🗺️', '标注了所有水母田和蟹堡王', '书籍', 1200, 81, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (76, '海泥面膜', '🧖', '深层清洁，珊迪敷完容光焕发', '美妆', 1300, 91, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (77, '泡泡洁面', '🫧', '洗脸同时吹泡泡，快乐加倍', '美妆', 1200, 91, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (78, '水母翻译机', '🗣️', '听懂水母的语言，派大星狂喜', '数码', 1300, 101, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (79, '泡泡无人机', '🚁', '飞起来拖着泡泡尾巴', '数码', 1200, 101, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (80, '秘制酱料罐', '🫙', '小包装，随时补蟹黄堡灵魂', '食材', 1300, 141, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (81, '有机海藻', '🥬', '蟹堡王指定供应商', '食材', 1200, 141, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (82, '水母冲浪板', '🏄', '印着水母图案，浪里最靓', '运动', 1300, 151, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
+INSERT INTO `bb_item` VALUES (83, '浮潜呼吸管', '🤿', '看清水母田全貌', '运动', 1200, 151, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
 
 -- ----------------------------
 -- Table structure for sys_user

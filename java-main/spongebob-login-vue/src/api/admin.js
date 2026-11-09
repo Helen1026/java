@@ -4,7 +4,7 @@ import request from './request'
  * 后台管理接口（直连真实后端 springBootTest）。
  *
  * 说明：
- *  - 全站默认走真实后端（Vite 在 dev 下把 /api 代理到 http://localhost:8081）。
+ *  - 全站默认走真实后端（Vite 在 dev 下把 /api 代理到 http://192.168.68.25:8081）。
  *  - /api/admin/** 受 JWT 拦截器保护（见 springBootTest 的 CorsConfig），
  *    必须由 request.js 自动在请求头带上 Authorization: Bearer <token>。
  *  - 后台登录复用 /api/auth/login 真实接口，确保拿到有效 JWT；本模块不进入 mock 分支，
@@ -29,41 +29,41 @@ export function adminLoginApi(data) {
 
 /** 当前登录管理员信息（受保护，用于后台展示昵称） */
 export function adminProfileApi() {
-  return request.get('/api/auth/profile')
+  return request.get('/auth/profile')
 }
 
 /** ===== 条目管理（bb_item） ===== */
 export function listItems(keyword) {
   const params = {}
   if (keyword && keyword.trim()) params.keyword = keyword.trim()
-  return request.get('/api/admin/item', { params })
+  return request.get('/admin/item', { params })
 }
 
 export function createItem(item) {
-  return request.post('/api/admin/item', item)
+  return request.post('/admin/item', item)
 }
 
 export function updateItem(id, item) {
-  return request.put(`/api/admin/item/${id}`, item)
+  return request.put(`/admin/item/${id}`, item)
 }
 
 export function deleteItem(id) {
-  return request.delete(`/api/admin/item/${id}`)
+  return request.delete(`/admin/item/${id}`)
 }
 
 /** ===== 分类管理（bb_category） ===== */
 export function listCategories() {
-  return request.get('/api/admin/category')
+  return request.get('/admin/category')
 }
 
 export function createCategory(category) {
-  return request.post('/api/admin/category', category)
+  return request.post('/admin/category', category)
 }
 
 export function updateCategory(id, category) {
-  return request.put(`/api/admin/category/${id}`, category)
+  return request.put(`/admin/category/${id}`, category)
 }
 
 export function deleteCategory(id) {
-  return request.delete(`/api/admin/category/${id}`)
+  return request.delete(`/admin/category/${id}`)
 }

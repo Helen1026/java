@@ -19,8 +19,9 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOriginPatterns("http://localhost:5173", "http://127.0.0.1:5173",
-                        "http://192.168.68.25:5173")
+                // 用通配端口 + 通配网段，避免局域网 IP 变化后跨域失效
+                .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*",
+                        "http://192.168.*.*:*", "http://10.*.*.*:*", "http://172.*.*.*:*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .maxAge(3600);

@@ -3,6 +3,7 @@
     <!-- ===== 顶部导航栏（与首页同款） ===== -->
     <header class="seabed-nav">
       <div class="seabed-nav-inner">
+        <button class="seabed-back" @click="back" title="返回上一页">← 返回</button>
         <button class="seabed-brand" @click="go('/home')">
           <span class="seabed-brand-icon">🍍</span>
           <span>比奇堡</span>
@@ -103,6 +104,15 @@ onMounted(() => {
 function go(path) {
   if (route.path === path) return
   router.push(path)
+}
+
+/** 智能返回：有浏览历史则后退（回到来时的页面），否则回到首页 */
+function back() {
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/home')
+  }
 }
 
 function logout() {

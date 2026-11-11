@@ -43,12 +43,24 @@ const router = createRouter({
 })
 
 // 后台管理需要已登录（携带有效 token）；未登录则跳转到后台登录页。
-// 注意：仅校验本地是否存有 token，真正的鉴权由后端 JWT 拦截器在接口调用时完成。
+// 真正的权限校验由后端 AdminController 白名单完成，这里只做前置拦截，
+// 避免「普通用户先进空白后台、等接口 403 再被弹走」的糟糕体验。
 router.beforeEach((to) => {
   if (to.meta?.requiresAdmin) {
     const token = localStorage.getItem('token')
     if (!token) {
       return { path: '/admin/login', query: { redirect: to.fullPath } }
+    }
+    // 已知是普通用户：直接引导到后台登录页换管理员账号
+    let role
+    try {
+      const raw = localStorage.getItem('userInfo')
+      role = raw ? JSON.parse(raw).role : undefined
+    } catch {
+      role = undefined
+    }
+    if (role === 'user') {
+      return { path: '/admin/login', query: { reason: 'noauth' } }
     }
   }
   return true

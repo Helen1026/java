@@ -141,6 +141,7 @@
       <!-- 搜索结果 -->
       <template v-if="searched">
         <div class="section-head">
+          <button class="btn-back" @click="clearSearch">← 返回</button>
           <h2>搜索结果</h2>
           <span class="section-tip">
             <template v-if="selectedCategoryId !== null">分类「{{ selectedCategoryName }}」</template>
@@ -247,6 +248,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { searchApi, recommendApi, categoriesApi, HOT_KEYWORDS } from '../api/home'
+import { openAdmin } from '../adminAccess'
 import CartButton from './CartButton.vue'
 
 const router = useRouter()
@@ -483,7 +485,8 @@ function goDetail(id) {
 }
 
 function goAdmin() {
-  router.push('/admin')
+  // 先确认当前账号的后台权限，再决定进后台还是去管理员登录页
+  openAdmin(router)
 }
 
 function logout() {
@@ -845,6 +848,21 @@ function logout() {
   transition: background .2s;
 }
 .btn-clear:hover { background: #FEF3C7; }
+
+/* 搜索结果头部：返回按钮（回到今日热门推荐视图） */
+.btn-back {
+  padding: 7px 14px;
+  border: 2px solid #7DD3FC;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .9);
+  color: #0369A1;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.btn-back:hover { background: #fff; transform: translateY(-1px); }
 
 .card-grid {
   display: grid;

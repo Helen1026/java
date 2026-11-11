@@ -1,6 +1,7 @@
 package com.fenglin.springboottest.controller;
 
 import com.fenglin.springboottest.common.Result;
+import com.fenglin.springboottest.config.AdminProperties;
 import com.fenglin.springboottest.dto.LoginRequest;
 import com.fenglin.springboottest.dto.RegisterRequest;
 import com.fenglin.springboottest.entity.User;
@@ -31,6 +32,9 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AdminProperties adminProperties;
+
     @PostMapping("/register")
     public Result<Map<String, Object>> register(@RequestBody RegisterRequest req) {
         return Result.ok(userService.register(req));
@@ -57,6 +61,8 @@ public class AuthController {
         data.put("username", user.getUsername());
         data.put("nickname", user.getNickname());
         data.put("avatar", user.getAvatar());
+        // 供前端判断是否展示/放行后台入口（最终鉴权仍在 AdminController 白名单）
+        data.put("role", adminProperties.isAdmin(user.getUsername()) ? "admin" : "user");
         return Result.ok(data);
     }
 

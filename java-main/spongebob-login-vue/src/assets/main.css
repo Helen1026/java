@@ -297,6 +297,22 @@ body {
   0%, 100% { transform: translateY(0) rotate(-6deg); }
   50%      { transform: translateY(-5px) rotate(6deg); }
 }
+/* 导航栏最左侧常驻「返回」按钮：解决子页面无返回入口的问题 */
+.seabed-back {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border: 2px solid #7DD3FC;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .9);
+  color: #0369A1;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.seabed-back:hover { background: #fff; transform: translateY(-1px); }
+
 .seabed-links {
   flex: 1;
   display: flex;

@@ -376,9 +376,9 @@ async function loadCategories() {
 function handleAuthError(err) {
   const m = (err.message || '').toLowerCase()
   if (m.includes('权限') || m.includes('403')) {
-    // 已登录但非管理员：提示后退回首页（避免卡在空白后台）
-    showToast('无权限访问后台管理系统')
-    setTimeout(() => router.replace('/home'), 1200)
+    // 已登录但不是管理员：直接引导到后台登录页换管理员账号。
+    // 不再弹提示后把用户甩回首页（那样会看到一瞬间的空白后台，还得重新登录）。
+    router.replace({ path: '/admin/login', query: { reason: 'noauth' } })
     return
   }
   if (m.includes('未登录') || m.includes('过期') || m.includes('401')) {

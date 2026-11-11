@@ -107,11 +107,12 @@ async function handleLogin() {
     if (res.data?.token) {
       localStorage.setItem('token', res.data.token)
     }
-    // 记录用户信息，首页导航栏会展示昵称
+    // 记录用户信息，首页导航栏会展示昵称；role 用于判断能否直接进后台
     localStorage.setItem('username', username.value)
     localStorage.setItem('userInfo', JSON.stringify({
       username: res.data?.username || username.value,
       nickname: res.data?.nickname || username.value,
+      role: res.data?.role || 'user',
     }))
     // 登录成功 → 跳转首页
     router.push('/home')

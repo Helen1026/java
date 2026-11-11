@@ -94,9 +94,21 @@ function fail(msg) {
   showError.value = true
 }
 
-// 已登录则直接进入后台（除非显式点了退出）
+// 已是管理员身份才自动进后台；普通用户点「后台管理」过来时停留本页换账号登录。
+// 注意不能只看 token：普通用户也有 token，否则会 /admin ⇄ /admin/login 来回横跳。
 onMounted(() => {
-  if (localStorage.getItem('token') && route.path === '/admin/login') {
+  if (route.query.reason === 'noauth') {
+    fail('当前账号没有后台管理权限，请使用管理员账号登录')
+    return
+  }
+  let role
+  try {
+    const raw = localStorage.getItem('userInfo')
+    role = raw ? JSON.parse(raw).role : undefined
+  } catch {
+    role = undefined
+  }
+  if (localStorage.getItem('token') && role === 'admin' && route.path === '/admin/login') {
     router.replace('/admin')
   }
 })

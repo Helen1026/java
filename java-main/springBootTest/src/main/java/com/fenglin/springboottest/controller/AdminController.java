@@ -2,6 +2,7 @@ package com.fenglin.springboottest.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fenglin.springboottest.common.Result;
+import com.fenglin.springboottest.config.AdminProperties;
 import com.fenglin.springboottest.entity.Category;
 import com.fenglin.springboottest.entity.Item;
 import com.fenglin.springboottest.service.CategoryService;
@@ -10,7 +11,6 @@ import com.fenglin.springboottest.vo.CategoryVO;
 import com.fenglin.springboottest.vo.ItemVO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +28,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -60,12 +59,11 @@ public class AdminController {
     private CategoryService categoryService;
 
     /**
-     * 允许进入后台管理系统的账号白名单（逗号分隔，大小写敏感）。
-     * 不配置时默认仅 spongebob、admin 可访问；其他账号即使登录成功也会被拒绝（403）。
-     * 在 application-*.properties 中覆盖：bikini.admin-usernames=alice,bob
+     * 后台账号白名单统一由 AdminProperties 提供（配置项 bikini.admin-usernames，
+     * 默认 spongebob、admin），与登录接口返回的 role 共用同一份名单。
      */
-    @Value("${bikini.admin-usernames:spongebob,admin}")
-    private String adminUsernames;
+    @Autowired
+    private AdminProperties adminProperties;
 
     /**
      * 列出全部条目（含禁用项，便于后台管理），可按关键词匹配 title/description/tag。
@@ -249,13 +247,8 @@ public class AdminController {
      */
     @ModelAttribute
     public void ensureAdmin() {
-        String username = currentUsername();
-        boolean allowed = username != null
-                && Arrays.stream(adminUsernames.split(","))
-                        .map(String::trim)
-                        .anyMatch(username::equals);
-        if (!allowed) {
-            throw new IllegalStateException("无权限访问后台管理系统");
+        if (!adminProperties.isAdmin(currentUsername())) {
+            throw new IllegalStateException("该账号没有后台管理权限，请使用管理员账号登录");
         }
     }
 

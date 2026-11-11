@@ -2,6 +2,7 @@ package com.fenglin.springboottest.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fenglin.springboottest.config.AdminProperties;
 import com.fenglin.springboottest.dto.LoginRequest;
 import com.fenglin.springboottest.dto.RegisterRequest;
 import com.fenglin.springboottest.entity.User;
@@ -26,6 +27,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private AdminProperties adminProperties;
 
     @Override
     public Map<String, Object> register(RegisterRequest req) {
@@ -77,6 +81,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         data.put("token", token);
         data.put("username", user.getUsername());
         data.put("nickname", user.getNickname());
+        // 前端据此判断能否进入后台：管理员直接放行，普通用户引导到后台登录页
+        data.put("role", adminProperties.isAdmin(user.getUsername()) ? "admin" : "user");
         return data;
     }
 

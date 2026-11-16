@@ -98,9 +98,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import PageShell from './PageShell.vue'
 import { useCart } from '../cart'
 import { recordOrder } from '../points'
+import { createOrderApi } from '../api/order'
+
+const router = useRouter()
 
 /** 菜单数据：价格单位为比奇堡币（¥），纯演示用 */
 const MENU = [
@@ -188,17 +192,42 @@ async function checkout() {
   const count = totalCount.value
   const amount = total.value
   if (!count) return
+
+  // 先快照当前购物车明细（结账后购物车会被清空），用于生成待付款订单
+  const snapshot = cartItems.value.map((row) => ({
+    itemId: row.id,
+    icon: row.icon,
+    name: row.title || row.name || '未命名商品',
+    price: row.price,
+    quantity: row.qty,
+  }))
+  const orderPayload = {
+    items: snapshot,
+    subtotal: Number(subtotal.value.toFixed(2)),
+    taxAmount: Number(tax.value.toFixed(2)),
+    totalAmount: Number(total.value.toFixed(2)),
+  }
+
   const res = await checkoutCart('krusty')
   if (!res.ok) {
     showToast(res.message || '结账失败，请稍后再试')
     return
   }
+
+  // 同步生成待付款订单，写入订单历史（待付款 / 已完成 / 已取消）
+  try {
+    await createOrderApi(orderPayload)
+  } catch (e) {
+    console.warn('[order] 生成订单记录失败：', e.message)
+  }
+
   // 下单算每日任务：每单 +15 积分，每天最多 3 单（详见 points.js）
   const award = recordOrder()
   const extra = award.ok
     ? `，积分 +${award.points} 🪙`
     : '（今日下单积分已拿满，明天再来）'
   showToast(`结账成功！共 ${count} 件，¥${amount.toFixed(2)}${extra}`)
+  setTimeout(() => router.push('/orders'), 700)
 }
 </script>
 

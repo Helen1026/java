@@ -91,6 +91,9 @@ curl -s -o /dev/null -w "%{http_code}" http://192.168.68.25:5173/
   共享样式在 `src/assets/main.css`，全局气泡/海底装饰在 `App.vue`（BubbleField、SeaDecor）
 - 首页数据：`src/api/home.js` 先请求 `/home/search`、`/home/recommend`，**后端未实现时自动回退本地演示数据**
   （因为 `.env.development` 是 `VITE_USE_MOCK=false`，如果直接报错会导致搜索不可用）
+- 订单模块：`src/api/order.js` 对应后端 `/api/order/**`，数据表 `bb_order`（订单主表，status：0 待付款 / 1 已完成 / 2 已取消）、
+  `bb_order_item`（订单明细快照），建表脚本 `springBootTest/sql/order.sql`；前端页面 `/orders`（OrderList.vue）。
+  后端未就绪时订单数据回退到 localStorage（key=`bikiniOrders`）。
 - 未做视觉截图验证（agent-browser 未安装），改动后请用 `curl http://192.168.68.25:5173/src/components/X.vue`
   检查 Vite 是否编译通过 + `tail` 前端日志看有无 error
 - 子页面（水母田 / 蟹堡王 / 菠萝屋 / 关于比奇堡 / 商品详情）统一用 `components/PageShell.vue` 包壳

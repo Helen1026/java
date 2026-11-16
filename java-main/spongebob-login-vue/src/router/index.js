@@ -9,6 +9,7 @@ import AboutBikiniBottom from '../components/AboutBikiniBottom.vue'
 import AdminLogin from '../components/AdminLogin.vue'
 import AdminDashboard from '../components/AdminDashboard.vue'
 import ItemDetail from '../components/ItemDetail.vue'
+import OrderList from '../components/OrderList.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -26,6 +27,8 @@ const routes = [
   { path: '/about', name: 'about', component: AboutBikiniBottom },
   // 商品详情页：点击首页商品卡片跳转
   { path: '/item/:id', name: 'itemDetail', component: ItemDetail },
+  // 我的订单：订单历史 + 付款 / 取消
+  { path: '/orders', name: 'orders', component: OrderList },
   // 后台管理：登录页（仅登录，无注册）
   { path: '/admin/login', name: 'adminLogin', component: AdminLogin },
   // 后台管理系统：管理首页展示的全部数据（条目 + 分类）

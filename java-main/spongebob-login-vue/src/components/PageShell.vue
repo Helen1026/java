@@ -83,6 +83,7 @@ const navItems = [
   { name: '首页', to: '/home' },
   { name: '水母田', to: '/jellyfish' },
   { name: '蟹堡王', to: '/krusty-krab' },
+  { name: '我的订单', to: '/orders' },
   { name: '菠萝屋', to: '/pineapple' },
   { name: '关于比奇堡', to: '/about' },
 ]

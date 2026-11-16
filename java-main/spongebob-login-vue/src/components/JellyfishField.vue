@@ -102,6 +102,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import PageShell from './PageShell.vue'
+import { recordCatch } from '../points'
 
 /** 图鉴数据：稀有度 / 捕捞难度参照比奇堡水母田的“民间说法” */
 const jellyfish = [
@@ -160,7 +161,13 @@ function catchOne(j) {
     return
   }
   basket.value.push({ ...j })
-  showToast(`抓到一只${j.name}！`)
+  // 每抓到一只 +5 积分，每天最多 10 只（详见 points.js）
+  const award = recordCatch(j.name)
+  showToast(
+    award.ok
+      ? `抓到一只${j.name}！积分 +${award.points} 🪙（${award.count}/${award.target}）`
+      : `抓到一只${j.name}！今日捕捉积分已拿满～`
+  )
 }
 
 function release(index) {
@@ -193,7 +200,7 @@ function keepAll() {
   padding: 12px 20px;
   background: rgba(255, 251, 235, .93);
   border: 3px solid #FBBF24;
-  border-radius: 18px;
+  border-radius: var(--r-card-sm);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
 }
 .stat-num {
@@ -223,7 +230,7 @@ function keepAll() {
 .pill-btn {
   padding: 6px 16px;
   border: 2px solid #7DD3FC;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, .9);
   color: #0369A1;
   font-family: inherit;
@@ -315,7 +322,7 @@ function keepAll() {
   left: 10px;
   padding: 2px 9px;
   background: rgba(4, 120, 87, .92);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #ECFDF5;
   font-size: 11px;
   font-weight: bold;

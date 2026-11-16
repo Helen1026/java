@@ -150,7 +150,7 @@ function go(path) {
   padding: 12px 18px;
   background: rgba(255, 251, 235, .93);
   border: 3px solid #FBBF24;
-  border-radius: 18px;
+  border-radius: var(--r-card-sm);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
 }
 .fact-num {
@@ -242,7 +242,7 @@ function go(path) {
   padding: 14px 18px;
   background: rgba(255, 251, 235, .95);
   border: 3px solid #FBBF24;
-  border-radius: 18px;
+  border-radius: var(--r-card-sm);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .16);
 }
 .tl-year {

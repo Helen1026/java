@@ -202,7 +202,7 @@ function goDetail(id) {
   padding: 40px 24px;
   background: linear-gradient(160deg, #FDE047, #FACC15);
   border: 4px solid #FBBF24;
-  border-radius: 24px;
+  border-radius: var(--r-card);
   box-shadow: 0 12px 26px rgba(0, 0, 0, .22), inset 0 -6px 0 rgba(0, 0, 0, .07);
   min-height: 280px;
 }
@@ -221,7 +221,7 @@ function goDetail(id) {
   padding: 5px 16px;
   background: rgba(255, 251, 235, .9);
   border: 2px solid #34D399;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #047857;
   font-size: 13px;
   font-weight: bold;
@@ -263,7 +263,7 @@ function goDetail(id) {
   gap: 14px;
   padding: 8px 16px;
   background: rgba(255, 251, 235, .92);
-  border-radius: 14px;
+  border-radius: var(--r-field);
 }
 .meta-label {
   min-width: 50px;
@@ -280,7 +280,7 @@ function goDetail(id) {
   padding: 2px 12px;
   background: #FEF3C7;
   border: 2px solid #F59E0B;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #B45309;
   font-size: 12px;
 }
@@ -297,7 +297,7 @@ function goDetail(id) {
 .btn-buy {
   padding: 12px 28px;
   border: none;
-  border-radius: 14px;
+  border-radius: var(--r-pill);
   background: linear-gradient(180deg, #FB7185, #E11D48);
   color: #fff;
   font-family: inherit;
@@ -315,7 +315,7 @@ function goDetail(id) {
 .btn-cart {
   padding: 12px 24px;
   border: 2px solid #34D399;
-  border-radius: 14px;
+  border-radius: var(--r-pill);
   background: linear-gradient(180deg, #34D399, #059669);
   color: #fff;
   font-family: inherit;
@@ -333,7 +333,7 @@ function goDetail(id) {
 .btn-back {
   padding: 12px 20px;
   border: 2px solid #7DD3FC;
-  border-radius: 14px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, .9);
   color: #0369A1;
   font-family: inherit;
@@ -349,7 +349,7 @@ function goDetail(id) {
   padding: 60px 20px;
   background: rgba(255, 251, 235, .93);
   border: 3px dashed #F59E0B;
-  border-radius: 22px;
+  border-radius: var(--r-card);
   text-align: center;
 }
 .loading-text {
@@ -400,7 +400,7 @@ function goDetail(id) {
   padding: 18px 16px 14px;
   background: linear-gradient(160deg, #FDE047, #FACC15);
   border: 4px solid #FBBF24;
-  border-radius: 18px;
+  border-radius: var(--r-card-sm);
   box-shadow: 0 10px 22px rgba(0, 0, 0, .2), inset 0 -5px 0 rgba(0, 0, 0, .07);
   cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease;
@@ -435,7 +435,7 @@ function goDetail(id) {
   padding: 2px 8px;
   background: rgba(255, 251, 235, .9);
   border: 2px solid #34D399;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #047857;
   font-size: 10px;
   font-weight: bold;
@@ -444,7 +444,7 @@ function goDetail(id) {
   padding: 2px 9px;
   background: rgba(255, 251, 235, .9);
   border: 2px solid #F59E0B;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #B45309;
   font-size: 11px;
   font-weight: bold;
@@ -453,7 +453,7 @@ function goDetail(id) {
   padding: 24px;
   background: rgba(255, 251, 235, .9);
   border: 2px dashed #F59E0B;
-  border-radius: 16px;
+  border-radius: var(--r-card-sm);
   color: #92400E;
   font-size: 13px;
   text-align: center;

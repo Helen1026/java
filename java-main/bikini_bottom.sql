@@ -11,11 +11,40 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 09/11/2026 11:48:09
+ Date: 16/11/2026 11:55:56
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for bb_cart
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_cart`;
+CREATE TABLE `bb_cart`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键（购物车行ID）',
+  `user_id` bigint NOT NULL COMMENT '所属用户ID（sys_user.id）',
+  `goods_key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商品唯一键：source:goodsId',
+  `source` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'home' COMMENT '来源：home 首页商品 / krusty 蟹堡王菜单',
+  `goods_id` bigint NULL DEFAULT NULL COMMENT '来源商品ID（bb_item.id 或蟹堡王菜单ID）',
+  `title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商品名称（快照）',
+  `icon` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '图标 emoji（快照）',
+  `tag` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '标签（快照）',
+  `price` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '单价（快照，比奇堡币）',
+  `qty` int NOT NULL DEFAULT 1 COMMENT '数量 1~99',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_user_goods`(`user_id` ASC, `goods_key` ASC) USING BTREE,
+  INDEX `idx_user`(`user_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '比奇堡购物车（按用户持久化）' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of bb_cart
+-- ----------------------------
+INSERT INTO `bb_cart` VALUES (4, 1, 'krusty:1', 'krusty', 1, '招牌蟹黄堡', '🍔', '主食', 12.00, 2, '2026-11-16 11:53:44', '2026-11-16 11:53:44');
+INSERT INTO `bb_cart` VALUES (5, 1, 'krusty:7', 'krusty', 7, '海藻冰淇淋', '🍦', '甜点', 9.00, 1, '2026-11-16 11:53:45', '2026-11-16 11:53:45');
+INSERT INTO `bb_cart` VALUES (6, 1, 'home:12', 'home', 12, '水母网（首页商品）', '🪼', '工具', 0.00, 1, '2026-11-16 11:53:45', '2026-11-16 11:53:45');
 
 -- ----------------------------
 -- Table structure for bb_category
@@ -198,12 +227,13 @@ CREATE TABLE `sys_user`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
 INSERT INTO `sys_user` VALUES (1, 'spongebob', 'f969248d621bcded4a3582a1c3b17a71eedfefa9120c36ee3bd1957438cd55b9', '海绵宝宝', NULL, 1, '2026-10-14 08:33:31', '2026-10-14 08:33:31');
 INSERT INTO `sys_user` VALUES (2, '海绵宝宝', '1f3662ccb05ee4aefdb171ebf84907fbbc8173d181d83ad8ceb712278417a028', '海绵宝宝', NULL, 1, '2026-10-14 08:54:14', '2026-10-14 08:54:14');
+INSERT INTO `sys_user` VALUES (3, 'Aeln', 'd51cc1cc39409b846d6c4e5e877eac1f47cd89994178a42b3707c4e895f37467', 'Aeln', NULL, 1, '2026-11-16 10:43:27', '2026-11-16 10:43:27');
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -11,7 +11,7 @@
         <div class="hole" style="width: 16px; height: 16px; top: 14px; right: 18px"></div>
         <div class="hole" style="width: 11px; height: 11px; bottom: 16px; left: 14px"></div>
 
-        <div class="avatar">{{ form.avatar }}</div>
+        <UserAvatar class="profile-avatar" :src="form.avatar" :size="88" />
         <h2 class="profile-name">{{ form.nickname || '海绵宝宝' }}</h2>
         <p class="profile-sign">{{ form.signature || '我准备好了！' }}</p>
 
@@ -39,10 +39,20 @@
             <span class="stat-label">蟹堡王订单</span>
           </div>
           <div class="stat-card">
+            <span class="stat-num">{{ pointsState.balance }}</span>
+            <span class="stat-label">我的积分</span>
+          </div>
+          <div class="stat-card">
             <span class="stat-num">{{ favorites.length }}</span>
             <span class="stat-label">收藏好物</span>
           </div>
         </div>
+
+        <!-- 每日任务 + 积分 -->
+        <DailyTasks />
+
+        <!-- 头像框商店 -->
+        <FrameShop @toast="showToast" />
 
         <section class="panel">
           <div class="panel-title">
@@ -85,15 +95,32 @@
             >
           </div>
           <div class="form-row">
-            <label for="avatar">头像</label>
-            <div class="avatar-picker">
-              <button
-                v-for="a in AVATARS"
-                :key="a"
-                class="avatar-opt"
-                :class="{ active: form.avatar === a }"
-                @click="form.avatar = a"
-              >{{ a }}</button>
+            <label>头像</label>
+            <div class="avatar-panel">
+              <div class="avatar-preview">
+                <UserAvatar :src="form.avatar" :size="54" :ring="false" />
+                <span class="avatar-preview-tip">当前头像</span>
+              </div>
+              <div class="avatar-picker">
+                <button
+                  v-for="a in AVATARS"
+                  :key="a"
+                  class="avatar-opt"
+                  :class="{ active: form.avatar === a }"
+                  @click="form.avatar = a"
+                >{{ a }}</button>
+                <button class="avatar-upload" title="选择一张本地图片做头像" @click="pickFile">
+                  📷 上传图片
+                </button>
+                <input
+                  ref="fileInput"
+                  class="avatar-file"
+                  type="file"
+                  accept="image/*"
+                  @change="onFileChange"
+                >
+              </div>
+              <p class="avatar-hint">支持 emoji 头像或本地图片（自动裁成方形并压缩，不会撑爆浏览器存储）</p>
             </div>
           </div>
           <div class="form-actions">
@@ -107,10 +134,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import PageShell from './PageShell.vue'
-
-const AVATARS = ['🧽', '⭐', '🦑', '🐿️', '🦀', '🐌']
+import UserAvatar from './UserAvatar.vue'
+import DailyTasks from './DailyTasks.vue'
+import FrameShop from './FrameShop.vue'
+import { pointsState } from '../points'
+import {
+  AVATARS,
+  DEFAULT_AVATAR,
+  DEFAULT_SIGNATURE,
+  loadProfile,
+  saveProfile,
+  readImageAsAvatar,
+} from '../userProfile'
 
 const DEFAULT_FAVORITES = [
   { id: 1, icon: '🍔', name: '蟹黄堡', desc: '蟹堡王招牌，海之霸永远无法复制的秘方' },
@@ -118,29 +155,25 @@ const DEFAULT_FAVORITES = [
   { id: 3, icon: '🐌', name: '小蜗的壳', desc: '一只会喵喵叫的宠物蜗牛，比奇堡最黏人' },
 ]
 
-const stats = reactive({ jelly: 27, orders: 12 })
+/** 统计卡数据来自积分系统累计（原来写死的 27 / 12 只是演示数字） */
+const stats = computed(() => ({
+  jelly: pointsState.totalCatch,
+  orders: pointsState.totalOrder,
+}))
 const username = ref('spongebob')
 const favorites = ref([...DEFAULT_FAVORITES])
-const form = reactive({ nickname: '海绵宝宝', signature: '我准备好了！', avatar: '🧽' })
+const form = reactive({ nickname: '海绵宝宝', signature: DEFAULT_SIGNATURE, avatar: DEFAULT_AVATAR })
 const toast = ref('')
+const fileInput = ref(null)
 let toastTimer = null
 
 onMounted(() => {
-  try {
-    const raw = localStorage.getItem('userInfo')
-    if (raw) {
-      const info = JSON.parse(raw)
-      username.value = info.username || username.value
-      form.nickname = info.nickname || info.username || form.nickname
-      form.signature = info.signature || form.signature
-      form.avatar = info.avatar || form.avatar
-    } else if (localStorage.getItem('username')) {
-      username.value = localStorage.getItem('username')
-      form.nickname = localStorage.getItem('username')
-    }
-  } catch {
-    /* 本地信息损坏时用默认资料 */
-  }
+  // 资料统一从 userProfile store 读，改完首页 / 导航栏会立即同步
+  const p = loadProfile()
+  username.value = p.username || username.value
+  form.nickname = p.nickname || form.nickname
+  form.signature = p.signature || form.signature
+  form.avatar = p.avatar || form.avatar
 
   try {
     const favRaw = localStorage.getItem('bikiniFavorites')
@@ -166,28 +199,45 @@ function persistFavorites() {
   localStorage.setItem('bikiniFavorites', JSON.stringify(favorites.value))
 }
 
-/** 保存资料：写回 localStorage，首页与导航栏会同步显示新昵称 */
+/** 保存资料：写入 store + localStorage，首页与导航栏会同步显示新昵称 / 新头像 */
 function save() {
   if (!form.nickname) {
     showToast('昵称不能为空哦')
     return
   }
-  const info = {
+  saveProfile({
     username: username.value,
     nickname: form.nickname,
     signature: form.signature,
     avatar: form.avatar,
-  }
-  localStorage.setItem('userInfo', JSON.stringify(info))
-  localStorage.setItem('username', username.value)
+  })
   persistFavorites()
   showToast('资料已保存，比奇堡的大家都看到啦')
 }
 
+/** 打开本地文件选择框（换自定义头像） */
+function pickFile() {
+  fileInput.value?.click()
+}
+
+async function onFileChange(e) {
+  const file = e.target.files && e.target.files[0]
+  if (!file) return
+  try {
+    form.avatar = await readImageAsAvatar(file)
+    showToast('头像已换好，记得点「保存资料」')
+  } catch (err) {
+    showToast(err.message || '图片读取失败，换一张试试')
+  } finally {
+    // 允许再次选择同一张图
+    if (fileInput.value) fileInput.value.value = ''
+  }
+}
+
 function reset() {
   form.nickname = username.value
-  form.signature = '我准备好了！'
-  form.avatar = '🧽'
+  form.signature = DEFAULT_SIGNATURE
+  form.avatar = DEFAULT_AVATAR
   showToast('已恢复默认资料（记得点保存）')
 }
 </script>
@@ -212,18 +262,9 @@ function reset() {
   padding: 26px 22px 22px;
   text-align: center;
 }
-.avatar {
-  width: 84px;
-  height: 84px;
+.profile-avatar {
   margin: 0 auto 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #FFFBEB;
-  border: 4px solid #F59E0B;
-  border-radius: 50%;
-  font-size: 44px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, .18);
+  display: flex !important;
 }
 .profile-name {
   color: #7C2D12;
@@ -267,14 +308,14 @@ function reset() {
 /* ===== 统计 ===== */
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 .stat-card {
   padding: 14px 10px;
   background: rgba(255, 251, 235, .93);
   border: 3px solid #FBBF24;
-  border-radius: 18px;
+  border-radius: var(--r-card-sm);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .16);
   text-align: center;
 }
@@ -317,7 +358,7 @@ function reset() {
   flex-shrink: 0;
   padding: 4px 10px;
   border: 2px solid #FBBF24;
-  border-radius: 10px;
+  border-radius: var(--r-pill);
   background: #FEF3C7;
   color: #92400E;
   font-family: inherit;
@@ -352,7 +393,7 @@ function reset() {
   min-width: 0;
   padding: 10px 14px;
   border: 3px solid #F59E0B;
-  border-radius: 14px;
+  border-radius: var(--r-field);
   background: #FFFBEB;
   color: #78350F;
   font-family: inherit;
@@ -364,8 +405,21 @@ function reset() {
   border-color: var(--sea-green);
   box-shadow: 0 0 0 4px rgba(45, 212, 191, .25);
 }
-.avatar-picker {
+.avatar-panel {
   flex: 1;
+  min-width: 0;
+}
+.avatar-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.avatar-preview-tip {
+  color: #B45309;
+  font-size: 12px;
+}
+.avatar-picker {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -374,7 +428,7 @@ function reset() {
   width: 38px;
   height: 38px;
   border: 3px solid #FBBF24;
-  border-radius: 12px;
+  border-radius: var(--r-field);
   background: #FFFBEB;
   font-size: 19px;
   line-height: 1;
@@ -386,6 +440,30 @@ function reset() {
   border-color: #059669;
   background: #D1FAE5;
 }
+.avatar-upload {
+  padding: 0 14px;
+  height: 38px;
+  border: 3px dashed #F59E0B;
+  border-radius: var(--r-field);
+  background: #FFFBEB;
+  color: #92400E;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.avatar-upload:hover {
+  background: #FEF3C7;
+  border-color: #D97706;
+}
+.avatar-file { display: none; }
+.avatar-hint {
+  margin-top: 8px;
+  color: #B45309;
+  font-size: 12px;
+  line-height: 1.6;
+}
 .form-actions {
   margin-top: 16px;
   display: flex;
@@ -396,5 +474,8 @@ function reset() {
 @media (max-width: 860px) {
   .pine-layout { grid-template-columns: 1fr; }
   .profile { position: static; }
+}
+@media (max-width: 520px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>

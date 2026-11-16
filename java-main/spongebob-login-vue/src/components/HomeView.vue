@@ -21,12 +21,13 @@
         </nav>
 
         <div class="nav-right">
+          <PointsChip />
           <CartButton />
           <button class="btn-admin" @click="goAdmin">🔐 后台管理</button>
-          <div class="user-chip" :title="nickname">
-            <span>🧽</span>
-            <span class="user-name">{{ nickname }}</span>
-          </div>
+          <button class="user-chip" :title="`${profile.nickname} · 去菠萝屋改资料`" @click="goProfile">
+            <UserAvatar :src="profile.avatar" :size="24" :ring="false" />
+            <span class="user-name">{{ profile.nickname }}</span>
+          </button>
           <button class="btn-logout" @click="logout">退出</button>
         </div>
       </div>
@@ -94,9 +95,11 @@
     <section class="highlights">
       <!-- 欢迎横幅 -->
       <div class="welcome-banner">
-        <div class="welcome-icon">🧽</div>
+        <button class="welcome-avatar-btn" title="去菠萝屋换头像 / 改昵称" @click="goProfile">
+          <UserAvatar :src="profile.avatar" :size="64" />
+        </button>
         <div class="welcome-text">
-          <h2>嗨，{{ nickname }}！欢迎回到比奇堡</h2>
+          <h2>嗨，{{ profile.nickname }}！欢迎回到比奇堡</h2>
           <p>今天也适合抓水母、做蟹黄堡～「{{ dailyQuote }}」</p>
         </div>
       </div>
@@ -134,6 +137,9 @@
           </div>
         </div>
       </div>
+
+      <!-- 今日任务（紧凑版）：下单 / 捕水母 / 登录都算积分，点右上角 🪙 去菠萝屋兑换头像框 -->
+      <DailyTasks compact class="home-tasks" />
     </section>
 
     <!-- ===== 内容区 ===== -->
@@ -232,10 +238,8 @@
       </template>
     </section>
 
-    <footer class="home-footer">
-      比奇堡登录系统 · 首页已接入后端（搜索 / 热门推荐 / 分级分类均可直连 springBootTest）
-      · 水母田、蟹堡王、菠萝屋、关于比奇堡均已上线
-    </footer>
+    <!-- ===== 比奇堡页脚 ===== -->
+    <SeaFooter note="首页已接入 springBootTest（搜索 / 热门推荐 / 分级分类）" />
 
     <!-- ===== 全局轻提示 ===== -->
     <transition name="toast-fade">
@@ -249,7 +253,12 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { searchApi, recommendApi, categoriesApi, HOT_KEYWORDS } from '../api/home'
 import { openAdmin } from '../adminAccess'
+import { profile, loadProfile, clearProfile } from '../userProfile'
 import CartButton from './CartButton.vue'
+import SeaFooter from './SeaFooter.vue'
+import UserAvatar from './UserAvatar.vue'
+import PointsChip from './PointsChip.vue'
+import DailyTasks from './DailyTasks.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -335,7 +344,6 @@ const loading = ref(false)
 const results = ref([])
 const recommended = ref([])
 const lastKeyword = ref('')
-const nickname = ref('海绵宝宝')
 const toast = ref('')
 /** 分级分类相关状态 */
 const categories = ref([])
@@ -380,18 +388,8 @@ const activeChildren = computed(() => {
 })
 
 onMounted(() => {
-  // 读取登录时写入的用户信息
-  try {
-    const raw = localStorage.getItem('userInfo')
-    if (raw) {
-      const info = JSON.parse(raw)
-      nickname.value = info.nickname || info.username || nickname.value
-    } else if (localStorage.getItem('username')) {
-      nickname.value = localStorage.getItem('username')
-    }
-  } catch {
-    /* 本地信息损坏时用默认昵称 */
-  }
+  // 读取登录时写入的用户资料（昵称 / 头像走全局 store，菠萝屋改完即刻同步）
+  loadProfile()
   dailyQuote.value = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]
   tickClock()
   clockTimer = setInterval(tickClock, 1000)
@@ -489,11 +487,14 @@ function goAdmin() {
   openAdmin(router)
 }
 
+/** 点击头像 / 昵称 → 去菠萝屋（个人中心，可换头像、改昵称） */
+function goProfile() {
+  router.push('/pineapple')
+}
+
 function logout() {
   if (!confirm('要离开比奇堡了吗？')) return
-  localStorage.removeItem('token')
-  localStorage.removeItem('userInfo')
-  localStorage.removeItem('username')
+  clearProfile()
   showToast('已退出登录，下次再来抓水母～')
   setTimeout(() => router.push('/login'), 700)
 }
@@ -558,7 +559,7 @@ function logout() {
 .nav-link {
   padding: 8px 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--r-pill);
   background: transparent;
   color: #92400E;
   font-family: inherit;
@@ -586,15 +587,23 @@ function logout() {
 .user-chip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  max-width: 160px;
-  padding: 6px 14px;
+  gap: 8px;
+  max-width: 168px;
+  padding: 5px 14px 5px 6px;
   background: #FFFBEB;
   border: 2px solid #FBBF24;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
+  font-family: inherit;
   font-size: 13px;
   font-weight: bold;
   color: #7C2D12;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .12s;
+}
+.user-chip:hover {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  transform: translateY(-1px);
 }
 .user-name {
   overflow: hidden;
@@ -603,7 +612,7 @@ function logout() {
 .btn-logout {
   padding: 7px 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--r-pill);
   background: linear-gradient(180deg, #FB7185, #E11D48);
   color: #fff;
   font-family: inherit;
@@ -616,7 +625,7 @@ function logout() {
 .btn-admin {
   padding: 7px 14px;
   border: 2px solid #34D399;
-  border-radius: 12px;
+  border-radius: var(--r-pill);
   background: linear-gradient(180deg, #34D399, #059669);
   color: #fff;
   font-family: inherit;
@@ -668,7 +677,7 @@ function logout() {
   padding: 10px 10px 10px 16px;
   background: linear-gradient(160deg, #FDE047, #FACC15);
   border: 4px solid #FBBF24;
-  border-radius: 24px;
+  border-radius: var(--r-card);
   box-shadow: 0 16px 36px rgba(0, 0, 0, .28), inset 0 -5px 0 rgba(0, 0, 0, .07);
 }
 .search-icon {
@@ -680,7 +689,7 @@ function logout() {
   min-width: 0;
   padding: 12px 14px;
   border: 3px solid transparent;
-  border-radius: 14px;
+  border-radius: var(--r-field);
   background: #FFFBEB;
   color: #78350F;
   font-family: inherit;
@@ -696,7 +705,7 @@ function logout() {
   flex-shrink: 0;
   padding: 12px 22px;
   border: none;
-  border-radius: 14px;
+  border-radius: var(--r-pill);
   background: linear-gradient(180deg, #34D399, #059669);
   color: #fff;
   font-family: inherit;
@@ -735,7 +744,7 @@ function logout() {
 .hot-chip {
   padding: 5px 13px;
   border: 2px solid #7DD3FC;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, .88);
   color: #0369A1;
   font-family: inherit;
@@ -766,7 +775,7 @@ function logout() {
 .cat-chip {
   padding: 6px 15px;
   border: 2px solid #7DD3FC;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, .9);
   color: #0369A1;
   font-family: inherit;
@@ -804,7 +813,7 @@ function logout() {
   padding: 2px 9px;
   background: rgba(255, 251, 235, .9);
   border: 2px solid #34D399;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #047857;
   font-size: 11px;
   font-weight: bold;
@@ -838,7 +847,7 @@ function logout() {
   margin-left: auto;
   padding: 7px 15px;
   border: 2px solid #FBBF24;
-  border-radius: 12px;
+  border-radius: var(--r-pill);
   background: #FFFBEB;
   color: #92400E;
   font-family: inherit;
@@ -853,7 +862,7 @@ function logout() {
 .btn-back {
   padding: 7px 14px;
   border: 2px solid #7DD3FC;
-  border-radius: 12px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, .9);
   color: #0369A1;
   font-family: inherit;
@@ -875,7 +884,7 @@ function logout() {
   padding: 20px 18px 16px;
   background: linear-gradient(160deg, #FDE047, #FACC15);
   border: 4px solid #FBBF24;
-  border-radius: 22px;
+  border-radius: var(--r-card);
   box-shadow: 0 12px 26px rgba(0, 0, 0, .22), inset 0 -6px 0 rgba(0, 0, 0, .07);
   cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease;
@@ -911,7 +920,7 @@ function logout() {
   padding: 3px 11px;
   background: rgba(255, 251, 235, .9);
   border: 2px solid #F59E0B;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #B45309;
   font-size: 12px;
   font-weight: bold;
@@ -926,7 +935,7 @@ function logout() {
   padding: 46px 20px;
   background: rgba(255, 251, 235, .93);
   border: 3px dashed #F59E0B;
-  border-radius: 22px;
+  border-radius: var(--r-card);
   color: #92400E;
   font-size: 15px;
   text-align: center;
@@ -935,15 +944,6 @@ function logout() {
 .placeholder-tip {
   color: #B45309;
   font-size: 13px;
-}
-
-/* ===== 页脚 ===== */
-.home-footer {
-  padding: 24px 20px 130px;
-  color: rgba(224, 242, 254, .9);
-  font-size: 12px;
-  text-align: center;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, .2);
 }
 
 /* ===== 轻提示 ===== */
@@ -956,7 +956,7 @@ function logout() {
   padding: 12px 24px;
   max-width: 88vw;
   background: rgba(124, 45, 18, .94);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: #FEF3C7;
   font-size: 14px;
   text-align: center;
@@ -985,15 +985,20 @@ function logout() {
   padding: 18px 22px;
   background: rgba(255, 251, 235, .95);
   border: 3px solid #FBBF24;
-  border-radius: 22px;
+  border-radius: var(--r-card);
   box-shadow: 0 12px 26px rgba(0, 0, 0, .22), inset 0 -5px 0 rgba(0, 0, 0, .05);
 }
-.welcome-icon {
-  font-size: 40px;
-  line-height: 1;
+.welcome-avatar-btn {
   flex-shrink: 0;
-  animation: bob 2.6s ease-in-out infinite;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform .16s ease;
 }
+.welcome-avatar-btn:hover { transform: translateY(-3px) rotate(-4deg); }
 .welcome-text h2 {
   margin: 0;
   color: #7C2D12;
@@ -1012,12 +1017,16 @@ function logout() {
   flex-wrap: wrap;
   gap: 16px;
 }
+/* 今日任务卡：和上方欢迎横幅 / 天气卡保持同一条视觉基线 */
+.home-tasks {
+  margin-top: 16px;
+}
 .weather-card {
   flex: 1 1 320px;
   padding: 18px 20px;
   background: linear-gradient(160deg, rgba(224, 242, 254, .96), rgba(186, 230, 253, .96));
   border: 3px solid #7DD3FC;
-  border-radius: 22px;
+  border-radius: var(--r-card);
   box-shadow: 0 12px 26px rgba(0, 0, 0, .2);
   color: #075985;
 }
@@ -1051,7 +1060,7 @@ function logout() {
   margin: 10px 0 0;
   padding: 8px 12px;
   background: rgba(255, 255, 255, .6);
-  border-radius: 12px;
+  border-radius: var(--r-field);
   font-size: 13px;
   color: #075985;
 }
@@ -1071,7 +1080,7 @@ function logout() {
   padding: 18px 10px;
   background: rgba(255, 251, 235, .95);
   border: 3px solid #FBBF24;
-  border-radius: 18px;
+  border-radius: var(--r-card-sm);
   box-shadow: 0 10px 22px rgba(0, 0, 0, .18);
 }
 .mini-num {
@@ -1103,7 +1112,7 @@ function logout() {
   padding: 12px 16px;
   background: rgba(255, 251, 235, .92);
   border: 2px solid #FDE047;
-  border-radius: 16px;
+  border-radius: var(--r-card-sm);
   cursor: pointer;
   transition: transform .16s ease, box-shadow .16s ease, background .2s;
 }
@@ -1161,6 +1170,10 @@ function logout() {
   }
   .nav-right {
     margin-left: auto;
+    /* 多了积分胶囊后一行放不下，允许换行而不是撑出屏幕 */
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 6px;
   }
   .hero {
     padding-top: 36px;

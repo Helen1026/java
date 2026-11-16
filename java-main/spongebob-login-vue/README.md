@@ -14,13 +14,16 @@ spongebob-login-vue/
     ├── App.vue             # 根组件：背景装饰 + router-view（含切换动画）
     ├── router/
     │   └── index.js        # 路由：/login、/register
+    ├── userProfile.js      # 用户资料 store（昵称 / 头像 / 签名，全站实时同步）
+    ├── points.js           # 积分系统 store：每日任务 / 积分流水 / 头像框（localStorage）
+    ├── cart.js             # 购物车 store（导航栏购物车面板共用）
     ├── api/
     │   ├── request.js      # axios 实例：baseURL、token 拦截、统一错误处理
     │   └── auth.js         # 登录 / 注册 / 验证码接口（支持 mock 开关）
     ├── assets/
-    │   └── main.css        # 全局样式 + 登录/注册卡片共享样式
+    │   └── main.css        # 全局样式 + 圆角规范 token + 登录/注册卡片共享样式
     ├── components/
-    │   ├── BubbleField.vue      # 上升气泡（JS 随机生成）
+    │   ├── BubbleField.vue      # 背景气泡：缓慢上浮 + 摆动，低透明度
     │   ├── SeaDecor.vue         # 海底装饰：沙滩、海草、花朵云
     │   ├── LoginCard.vue        # 登录卡片：海绵宝宝头像、表单、校验
     │   ├── RegisterCard.vue     # 注册卡片：派大星头像、密码规则、验证码
@@ -29,6 +32,11 @@ spongebob-login-vue/
     │   ├── AdminLogin.vue       # 后台登录：仅登录（无注册）
     │   ├── AdminDashboard.vue   # 后台管理：条目 + 分类 CRUD（侧边栏 + 表格 + 弹窗）
     │   ├── PageShell.vue        # 子页面外壳：导航栏 / 标题区 / 页脚 / 轻提示
+    │   ├── SeaFooter.vue        # 全站页脚：版权 / 关于比奇堡 / 联系管理员 / 小标语
+    │   ├── UserAvatar.vue       # 头像：支持 emoji / 本地图片 / 6 款头像框
+    │   ├── PointsChip.vue       # 导航栏积分胶囊：余额 + 今日任务进度点
+    │   ├── DailyTasks.vue       # 每日任务面板：登录 / 下单 / 捕水母进度 + 积分流水
+    │   ├── FrameShop.vue        # 头像框商店：积分兑换 / 佩戴
     │   ├── JellyfishField.vue   # 水母田：图鉴 + 捕捞 + 鱼篓
     │   ├── KrustyKrab.vue       # 蟹堡王：菜单 + 购物车 + 结账
     │   ├── PineappleHouse.vue   # 菠萝屋：个人中心 / 收藏 / 资料设置
@@ -42,7 +50,7 @@ npm install
 npm run dev
 ```
 
-浏览器打开终端提示的地址（默认 http://localhost:5173），自动跳转到 `/login`。
+浏览器打开 http://192.168.68.25:5173 ，自动跳转到 `/login`（本机自测也可以用 http://localhost:5173 ）。
 
 ## 构建
 
@@ -82,12 +90,16 @@ npm run build
 
 接口层已封装好（`src/api/`），后端未就绪前所有接口走本地模拟（mock），页面可独立开发。
 
-后端已就绪（springBootTest，端口 8081），`.env.development` 当前配置：
+后端已就绪（springBootTest，端口 8081，本机 IP 192.168.68.25），`.env.development` 当前配置：
 
 ```
-VITE_API_BASE_URL=http://localhost:8081/api
+VITE_BACKEND_ORIGIN=http://192.168.68.25:8081   # Vite 代理目标（后端地址）
+VITE_API_BASE_URL=/api                          # axios baseURL，走上面的代理
 VITE_USE_MOCK=false
 ```
+
+> 换网络 / 换 IP 时只改 `VITE_BACKEND_ORIGIN` 一处；只想本机自测可临时改成 `http://127.0.0.1:8081`。
+> 后端 `server.address=0.0.0.0`，所以后端本身就同时监听 192.168.68.25:8081 和 localhost:8081。
 
 后端未启动时可把 `VITE_USE_MOCK` 改回 `true`，接口走本地模拟。
 

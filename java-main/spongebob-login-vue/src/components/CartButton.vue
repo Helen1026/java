@@ -13,24 +13,29 @@
     <transition name="cart-pop">
       <section v-if="open" class="cart-panel">
         <header class="cart-head">
-          <span class="cart-head-title">我的购物车</span>
-          <button v-if="items.length" class="cart-clear" @click="clear">清空</button>
+          <span class="cart-head-title">
+            我的购物车
+            <span v-if="synced" class="cart-sync" title="已保存到账号，换设备登录也在">☁️ 已同步</span>
+          </span>
+          <button v-if="items.length" class="cart-clear" @click="clearAll">清空</button>
         </header>
 
         <ul v-if="items.length" class="cart-list">
-          <li v-for="row in items" :key="row.id" class="cart-row">
+          <li v-for="row in items" :key="row.goodsKey" class="cart-row">
             <span class="cart-icon">{{ row.icon }}</span>
             <div class="cart-info">
               <div class="cart-title" :title="row.title">{{ row.title }}</div>
               <div class="cart-sub">
                 <span v-if="row.tag" class="cart-tag">{{ row.tag }}</span>
+                <span v-if="row.source === 'krusty'" class="cart-tag krusty">蟹堡王</span>
                 <span v-if="row.price > 0" class="cart-price">¥{{ row.price.toFixed(2) }}</span>
               </div>
             </div>
             <div class="cart-ops">
-              <button class="cart-step" title="减少" @click="setQty(row.id, row.qty - 1)">−</button>
+              <button class="cart-step" title="减少" @click="setQty(row.goodsKey, row.qty - 1)">−</button>
               <span class="cart-qty">{{ row.qty }}</span>
-              <button class="cart-step" title="增加" @click="setQty(row.id, row.qty + 1)">+</button>
+              <button class="cart-step" title="增加" @click="setQty(row.goodsKey, row.qty + 1)">+</button>
+              <button class="cart-del" title="从购物车移除" @click="remove(row.goodsKey)">✕</button>
             </div>
           </li>
         </ul>
@@ -55,12 +60,23 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useCart } from '../cart'
+import { recordOrder } from '../points'
 
 /**
  * 导航栏购物车按钮：显示件数角标，点击展开下拉面板。
  * 项目没有独立的 /cart 路由，所以用面板承载「查看 / 增减 / 结算」。
  */
-const { items, count, total, hasPrice, setQty, clear } = useCart()
+const {
+  items,
+  count,
+  total,
+  hasPrice,
+  synced,
+  setQty,
+  remove,
+  clear,
+  checkout: submitCart,
+} = useCart()
 
 const open = ref(false)
 const wrapRef = ref(null)
@@ -79,11 +95,24 @@ function flash(msg) {
   }, 2200)
 }
 
-function checkout() {
+/** 结算：走后端 /api/cart/checkout 清空服务端购物车，再记一次下单积分 */
+async function checkout() {
   if (!items.value.length) return
-  clear()
+  const res = await submitCart()
+  if (!res.ok) {
+    flash('结算失败，请稍后再试')
+    return
+  }
   open.value = false
-  flash('订单已提交，蟹老板正在数钱 💰')
+  const award = recordOrder()
+  flash(
+    `订单已提交（${res.count} 件）` +
+      (award.ok ? `，积分 +${award.points} 🪙` : '，今日下单积分已拿满 💰')
+  )
+}
+
+function clearAll() {
+  clear()
 }
 
 /** 点击面板外部或按 Esc 关闭 */
@@ -124,7 +153,7 @@ onBeforeUnmount(() => {
   height: 36px;
   padding: 0;
   border: 2px solid #FBBF24;
-  border-radius: 12px;
+  border-radius: var(--r-pill);
   background: #FFFBEB;
   font-family: inherit;
   font-size: 17px;
@@ -149,7 +178,7 @@ onBeforeUnmount(() => {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: linear-gradient(180deg, #FB7185, #E11D48);
   color: #fff;
   font-size: 11px;
@@ -168,7 +197,7 @@ onBeforeUnmount(() => {
   width: 308px;
   padding: 12px;
   border: 3px solid #FBBF24;
-  border-radius: 16px;
+  border-radius: var(--r-card);
   background: #FFFBEB;
   box-shadow: 0 14px 32px rgba(12, 74, 110, .28);
 }
@@ -188,7 +217,7 @@ onBeforeUnmount(() => {
 .cart-clear {
   padding: 3px 9px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: #FEE2E2;
   color: #B91C1C;
   font-family: inherit;
@@ -196,6 +225,16 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 .cart-clear:hover { background: #FECACA; }
+.cart-sync {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  background: #D1FAE5;
+  color: #047857;
+  font-size: 10px;
+  font-weight: normal;
+  vertical-align: middle;
+}
 
 .cart-list {
   max-height: 268px;
@@ -209,7 +248,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   padding: 8px 4px;
-  border-radius: 10px;
+  border-radius: var(--r-field);
 }
 .cart-row:hover { background: #FEF9E7; }
 
@@ -231,10 +270,14 @@ onBeforeUnmount(() => {
 }
 .cart-tag {
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: #DBEAFE;
   color: #1D4ED8;
   font-size: 11px;
+}
+.cart-tag.krusty {
+  background: #FFE4E6;
+  color: #BE123C;
 }
 .cart-price {
   font-size: 12px;
@@ -253,7 +296,7 @@ onBeforeUnmount(() => {
   height: 22px;
   padding: 0;
   border: 2px solid #FBBF24;
-  border-radius: 8px;
+  border-radius: var(--r-pill);
   background: #fff;
   color: #92400E;
   font-family: inherit;
@@ -263,6 +306,20 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 .cart-step:hover { background: #FEF3C7; }
+.cart-del {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--r-pill);
+  background: #FEE2E2;
+  color: #B91C1C;
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+.cart-del:hover { background: #FECACA; }
 .cart-qty {
   min-width: 20px;
   text-align: center;
@@ -296,7 +353,7 @@ onBeforeUnmount(() => {
 .cart-checkout {
   padding: 7px 16px;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--r-pill);
   background: linear-gradient(180deg, #34D399, #059669);
   color: #fff;
   font-family: inherit;
@@ -315,7 +372,7 @@ onBeforeUnmount(() => {
   z-index: 999;
   transform: translateX(-50%);
   padding: 10px 22px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(124, 45, 18, .92);
   color: #FFFBEB;
   font-size: 13px;

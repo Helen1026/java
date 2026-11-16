@@ -59,8 +59,8 @@ start "前端-5173" cmd /k "npm install --no-audit --no-fund && npm run dev"
 echo.
 echo ================================================
 echo   全部启动命令已发出！
-echo   前端页面: http://localhost:5173
-echo   后端接口: http://localhost:8081
+echo   前端页面: http://192.168.68.25:5173
+echo   后端接口: http://192.168.68.25:8081
 echo   测试账号: spongebob / 12345678a
 echo   停止项目: 双击 stop.bat
 echo ================================================

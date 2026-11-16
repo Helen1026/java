@@ -22,11 +22,12 @@
         </nav>
 
         <div class="seabed-right">
+          <PointsChip />
           <CartButton />
-          <div class="seabed-chip" :title="nickname">
-            <span>{{ avatar }}</span>
-            <span>{{ nickname }}</span>
-          </div>
+          <button class="seabed-chip" :title="`${profile.nickname} · 去菠萝屋改资料`" @click="go('/pineapple')">
+            <UserAvatar :src="profile.avatar" :size="24" :ring="false" />
+            <span>{{ profile.nickname }}</span>
+          </button>
           <button class="seabed-logout" @click="logout">退出</button>
         </div>
       </div>
@@ -44,9 +45,8 @@
       <slot />
     </section>
 
-    <footer class="page-footer">
-      {{ footerText || '比奇堡 · 海底小镇日常记录' }}
-    </footer>
+    <!-- ===== 比奇堡页脚（版权 / 关于 / 联系管理员 / 小标语） ===== -->
+    <SeaFooter :note="footerText" />
 
     <!-- ===== 全局轻提示 ===== -->
     <transition name="page-toast-fade">
@@ -56,9 +56,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CartButton from './CartButton.vue'
+import PointsChip from './PointsChip.vue'
+import SeaFooter from './SeaFooter.vue'
+import UserAvatar from './UserAvatar.vue'
+import { profile, loadProfile, clearProfile } from '../userProfile'
 
 defineProps({
   /** 页面主标题 */
@@ -83,22 +87,8 @@ const navItems = [
   { name: '关于比奇堡', to: '/about' },
 ]
 
-const nickname = ref('海绵宝宝')
-const avatar = ref('🧽')
-
 onMounted(() => {
-  try {
-    const raw = localStorage.getItem('userInfo')
-    if (raw) {
-      const info = JSON.parse(raw)
-      nickname.value = info.nickname || info.username || nickname.value
-      avatar.value = info.avatar || avatar.value
-    } else if (localStorage.getItem('username')) {
-      nickname.value = localStorage.getItem('username')
-    }
-  } catch {
-    /* 本地信息损坏时用默认昵称 */
-  }
+  loadProfile()
 })
 
 function go(path) {
@@ -117,9 +107,7 @@ function back() {
 
 function logout() {
   if (!confirm('要离开比奇堡了吗？')) return
-  localStorage.removeItem('token')
-  localStorage.removeItem('userInfo')
-  localStorage.removeItem('username')
+  clearProfile()
   router.push('/login')
 }
 </script>

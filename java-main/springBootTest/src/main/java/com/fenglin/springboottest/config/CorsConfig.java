@@ -15,12 +15,13 @@ public class CorsConfig implements WebMvcConfigurer {
     @Autowired
     private AuthInterceptor authInterceptor;
 
-    /** 跨域：允许 Vite 开发服务器访问后端接口（localhost 与本地 IP 均放行） */
+    /** 跨域：允许 Vite 开发服务器访问后端接口（本机局域网 IP 192.168.68.25 与 localhost 均放行） */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                // 用通配端口 + 通配网段，避免局域网 IP 变化后跨域失效
-                .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*",
+                // 显式放行本机 IP，同时保留通配网段，避免局域网 IP 变化后跨域失效
+                .allowedOriginPatterns("http://192.168.68.25:*",
+                        "http://localhost:*", "http://127.0.0.1:*",
                         "http://192.168.*.*:*", "http://10.*.*.*:*", "http://172.*.*.*:*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

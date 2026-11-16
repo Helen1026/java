@@ -50,18 +50,19 @@
           🧾 我的订单
           <span class="panel-extra">{{ totalCount }} 件</span>
         </div>
+        <p class="cart-hint">订单已保存到你的账号，刷新或换设备都不会丢</p>
 
         <ul v-if="cartItems.length" class="cart-list">
-          <li v-for="row in cartItems" :key="row.id" class="cart-item">
+          <li v-for="row in cartItems" :key="row.goodsKey" class="cart-item">
             <span class="cart-icon">{{ row.icon }}</span>
             <div class="cart-info">
-              <div class="cart-name">{{ row.name }}</div>
+              <div class="cart-name">{{ row.title }}</div>
               <div class="cart-unit">¥{{ row.price.toFixed(2) }} / 份</div>
             </div>
             <div class="qty">
-              <button class="qty-btn" @click="changeQty(row.id, -1)">−</button>
+              <button class="qty-btn" @click="changeQty(row, -1)">−</button>
               <span class="qty-num">{{ row.qty }}</span>
-              <button class="qty-btn" @click="changeQty(row.id, 1)">+</button>
+              <button class="qty-btn" @click="changeQty(row, 1)">+</button>
             </div>
           </li>
         </ul>
@@ -98,6 +99,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import PageShell from './PageShell.vue'
+import { useCart } from '../cart'
+import { recordOrder } from '../points'
 
 /** 菜单数据：价格单位为比奇堡币（¥），纯演示用 */
 const MENU = [
@@ -137,22 +140,23 @@ const MENU = [
 const TABS = ['全部', '主食', '饮料', '甜点', '小食', '套餐']
 
 const tab = ref('全部')
-/** id -> 份数 */
-const cart = ref({})
 const toast = ref('')
 let toastTimer = null
+
+/**
+ * 订单走全站购物车 store（服务端 bb_cart 表持久化），这里只取来源为 krusty 的那部分。
+ * 好处：蟹堡王加的菜和首页加的菜共用一张表，刷新、换设备、退出再登录都还在。
+ */
+const { add: addToCartApi, setQty, clear: clearCartApi, checkout: checkoutCart, bySource } = useCart()
+const krustyRows = bySource('krusty')
 
 const visibleMenu = computed(() =>
   tab.value === '全部' ? MENU : MENU.filter((d) => d.tag === tab.value)
 )
 
-const cartItems = computed(() =>
-  MENU.filter((d) => cart.value[d.id] > 0).map((d) => ({ ...d, qty: cart.value[d.id] }))
-)
+const cartItems = computed(() => krustyRows.value)
 
-const totalCount = computed(() =>
-  Object.values(cart.value).reduce((sum, n) => sum + n, 0)
-)
+const totalCount = computed(() => cartItems.value.reduce((sum, row) => sum + row.qty, 0))
 const subtotal = computed(() =>
   cartItems.value.reduce((sum, row) => sum + row.price * row.qty, 0)
 )
@@ -166,27 +170,35 @@ function showToast(msg) {
 }
 
 function addToCart(dish) {
-  cart.value[dish.id] = (cart.value[dish.id] || 0) + 1
+  // source 标记来源，避免和首页商品 id 撞车（两边都从 1 开始编号）
+  addToCartApi({ ...dish, source: 'krusty' })
   showToast(`${dish.name} 已加入订单`)
 }
 
-function changeQty(id, delta) {
-  const next = (cart.value[id] || 0) + delta
-  if (next <= 0) {
-    delete cart.value[id]
-    return
-  }
-  cart.value[id] = next
+function changeQty(row, delta) {
+  setQty(row.goodsKey, row.qty + delta)
 }
 
 function clearCart() {
-  cart.value = {}
+  clearCartApi('krusty')
   showToast('订单已清空，蟹老板不太高兴')
 }
 
-function checkout() {
-  showToast(`结账成功！共 ${totalCount.value} 件，¥${total.value.toFixed(2)}，谢谢光临～`)
-  cart.value = {}
+async function checkout() {
+  const count = totalCount.value
+  const amount = total.value
+  if (!count) return
+  const res = await checkoutCart('krusty')
+  if (!res.ok) {
+    showToast(res.message || '结账失败，请稍后再试')
+    return
+  }
+  // 下单算每日任务：每单 +15 积分，每天最多 3 单（详见 points.js）
+  const award = recordOrder()
+  const extra = award.ok
+    ? `，积分 +${award.points} 🪙`
+    : '（今日下单积分已拿满，明天再来）'
+  showToast(`结账成功！共 ${count} 件，¥${amount.toFixed(2)}${extra}`)
 }
 </script>
 
@@ -202,7 +214,7 @@ function checkout() {
 .tag-btn {
   padding: 6px 18px;
   border: 2px solid #7DD3FC;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, .9);
   color: #0369A1;
   font-family: inherit;
@@ -281,6 +293,12 @@ function checkout() {
   top: 88px;
   background: rgba(255, 251, 235, .96);
 }
+.cart-hint {
+  margin: -6px 0 10px;
+  color: #B45309;
+  font-size: 11px;
+  line-height: 1.5;
+}
 .cart-list {
   list-style: none;
   max-height: 300px;
@@ -315,7 +333,7 @@ function checkout() {
   width: 24px;
   height: 24px;
   border: 2px solid #FBBF24;
-  border-radius: 8px;
+  border-radius: var(--r-pill);
   background: #FEF3C7;
   color: #92400E;
   font-size: 13px;

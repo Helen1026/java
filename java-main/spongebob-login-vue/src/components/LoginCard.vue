@@ -66,6 +66,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { loginApi } from '../api/auth'
+import { refreshCart } from '../cart'
 
 const router = useRouter()
 
@@ -114,7 +115,9 @@ async function handleLogin() {
       nickname: res.data?.nickname || username.value,
       role: res.data?.role || 'user',
     }))
-    // 登录成功 → 跳转首页
+    // 登录成功 → 拉取该账号的购物车（未登录期间加进本机的商品会一并合并进来）
+    await refreshCart()
+    // 跳转首页
     router.push('/home')
   } catch (err) {
     fail(err.message || '登录失败，请稍后再试')

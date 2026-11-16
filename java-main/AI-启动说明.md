@@ -9,7 +9,11 @@
 | 项目 | 路径（相对本文件） | 端口 | 说明 |
 |---|---|---|---|
 | 后端 springBootTest | `.\springBootTest` | 8081 | Spring Boot 3.4.5 + MyBatis-Plus + MySQL + JWT，profile=dev |
-| 前端 spongebob-login-vue | `.\spongebob-login-vue` | 5173 | Vue 3 + Vite 6 + vue-router + axios，API 指向 http://localhost:8081/api |
+| 前端 spongebob-login-vue | `.\spongebob-login-vue` | 5173 | Vue 3 + Vite 6 + vue-router + axios，API 经 Vite 代理指向 http://192.168.68.25:8081/api |
+
+- 访问地址（本机局域网 IP 192.168.68.25）：前端 http://192.168.68.25:5173 ，后端 http://192.168.68.25:8081
+- IP 配置位置：`spongebob-login-vue\.env.development` 的 `VITE_BACKEND_ORIGIN`（Vite 代理目标）与
+  `vite.config.js` 里的同名默认值；后端 `server.address=0.0.0.0` 监听全部网卡，已包含该 IP（不写死，防 DHCP 换 IP 启动失败）
 
 - 数据库：MySQL `bikini_bottom`，表 `sys_user`，账号 root/123456
 - 测试账号：spongebob / 12345678a
@@ -55,8 +59,8 @@ cd "/c/Users/Administrator/Desktop/java-main/spongebob-login-vue" && npm install
 
 验证（Bash）：
 ```bash
-curl -s -X POST http://localhost:8081/api/auth/login -H "Content-Type: application/json" -d '{"username":"spongebob","password":"12345678a"}'
-curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/
+curl -s -X POST http://192.168.68.25:8081/api/auth/login -H "Content-Type: application/json" -d '{"username":"spongebob","password":"12345678a"}'
+curl -s -o /dev/null -w "%{http_code}" http://192.168.68.25:5173/
 ```
 
 ## 五、已知坑（重要！都是实测踩过的）
@@ -87,8 +91,47 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/
   共享样式在 `src/assets/main.css`，全局气泡/海底装饰在 `App.vue`（BubbleField、SeaDecor）
 - 首页数据：`src/api/home.js` 先请求 `/home/search`、`/home/recommend`，**后端未实现时自动回退本地演示数据**
   （因为 `.env.development` 是 `VITE_USE_MOCK=false`，如果直接报错会导致搜索不可用）
-- 未做视觉截图验证（agent-browser 未安装），改动后请用 `curl http://localhost:5173/src/components/X.vue`
+- 未做视觉截图验证（agent-browser 未安装），改动后请用 `curl http://192.168.68.25:5173/src/components/X.vue`
   检查 Vite 是否编译通过 + `tail` 前端日志看有无 error
+- 子页面（水母田 / 蟹堡王 / 菠萝屋 / 关于比奇堡 / 商品详情）统一用 `components/PageShell.vue` 包壳
+
+### 2026-11-16 视觉优化：新增的共享件与约定（改页面前先看这里）
+
+| 文件 | 作用 |
+|---|---|
+| `components/BubbleField.vue` | 全站背景气泡：18~40s 缓慢上浮 + 左右摆动，峰值透明度 0.14~0.34，`prefers-reduced-motion` 下自动关闭。样式已收敛到组件 scoped，**main.css 里不再有 `.bubble`** |
+| `components/SeaFooter.vue` | 全站页脚：版权 / 关于比奇堡 / 联系管理员（弹层可复制邮箱）/ 海绵宝宝小标语。首页直接引入，子页面由 PageShell 渲染，`footer-text` 会作为页脚补充说明 |
+| `components/UserAvatar.vue` | 头像组件：同时支持 emoji 与图片 dataURL，`size` 控制直径，全站导航/欢迎语/个人中心共用 |
+| `src/userProfile.js` | 用户资料响应式 store（nickname / avatar / signature），提供 `loadProfile` / `saveProfile` / `clearProfile` / `readImageAsAvatar`（本地图片裁切压缩成 160×160 JPEG）。改完资料后首页与各子页面导航栏**实时同步** |
+
+圆角规范（`src/assets/main.css` 的 `:root`，不要再手写具体数值）：
+
+- `--r-pill: 999px` —— 所有可点元素：导航按钮、搜索按钮、分类/热门标签、返回/清空/退出、页脚链接
+- `--r-card: 22px` —— 大卡片、面板、弹层、搜索栏容器
+- `--r-card-sm: 18px` —— 小卡片、榜单条
+- `--r-field: 14px` —— 输入框
+
+### 2026-11-16 每日任务积分系统（新增）
+
+| 文件 | 作用 |
+|---|---|
+| `src/points.js` | 积分 store：余额 / 每日任务计数 / 积分流水 / 头像框拥有与佩戴，全部存 localStorage 的 `bb_points` |
+| `components/DailyTasks.vue` | 每日任务面板：三档任务进度条 + 今日所得 + 最近积分记录（首页用 `compact` 紧凑版） |
+| `components/PointsChip.vue` | 导航栏积分胶囊：余额 + 今日完成进度点，点进菠萝屋 |
+| `components/FrameShop.vue` | 头像框商店：兑换（扣积分并自动佩戴）/ 佩戴已拥有的框 |
+| `components/UserAvatar.vue` | 新增 `frame` 能力：6 款纯 CSS 头像框，不传 `frame` 时跟随全站佩戴状态 |
+
+规则（每日 0 点按自然日重置计数，余额不清零，单日上限 105）：
+
+| 任务 | 积分 | 每日上限 | 触发位置 |
+|---|---|---|---|
+| 每日登录 | +10 | 1 次 | `App.vue` 里 `claimDailyLogin()`（有 token 才发，路由变化补一次） |
+| 蟹堡王下单 | +15 | 3 单 | `KrustyKrab.checkout()`、`CartButton.checkout()` |
+| 捕捉水母 | +5 | 10 只 | `JellyfishField.catchOne()`（捕捞成功即计入，放生不退） |
+
+头像框：原味（免费）/ 贝壳光环 60 / 泡泡之环 120 / 珊瑚花冠 200 / 水母荧光 300 / 菠萝皇冠 450 / 海绵金边 600。
+
+注意：积分目前只存在浏览器本地（和购物车、收藏一致），**没有后端表**。以后接后端时只需把 `points.js` 里的 `addPoints` / `recordOrder` / `redeemFrame` 换成接口调用，页面不用改。
 
 ## 七、缺什么（本次补齐情况）
 

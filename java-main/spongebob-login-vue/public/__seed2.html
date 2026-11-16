@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>seed2</title></head>
+<body>
+<script>
+  localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzcG9uZ2Vib2IiLCJ1aWQiOjEsImlhdCI6MTc5NDgwMDk1MiwiZXhwIjoxNzk0ODA4MTUyfQ.SM6KhKoAk5_WIZoaLcl596KUGc2KGcl9aUYcttd8a8c')
+  localStorage.setItem('username', 'spongebob')
+  localStorage.setItem('userInfo', JSON.stringify({ username: 'spongebob', nickname: '海绵宝宝', signature: '我准备好了！', role: 'user' }))
+  localStorage.removeItem('bb_cart')
+  const to = new URLSearchParams(location.search).get('to') || '/krusty-krab'
+  location.replace(to)
+</script>
+</body></html>

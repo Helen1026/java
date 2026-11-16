@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>seed</title></head>
+<body>
+<script>
+  // 临时测试页：给截图用的 localStorage 造数据，截完即删
+  const d = new Date()
+  const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  localStorage.setItem('token', 'demo-token')
+  localStorage.setItem('username', 'spongebob')
+  localStorage.setItem('userInfo', JSON.stringify({
+    username: 'spongebob', nickname: '海绵宝宝', signature: '我准备好了！', role: 'user',
+  }))
+  localStorage.setItem('bb_points', JSON.stringify({
+    balance: 340, earned: 495, date: key,
+    tasks: { login: 1, order: 2, catch: 6 },
+    totalOrder: 12, totalCatch: 41,
+    frames: ['none', 'shell', 'bubble'], frame: 'bubble',
+    history: [
+      { id: '1', type: 'catch', title: '捕捉水母 · 星光水母', points: 5, time: '2026/11/16 11:20:31' },
+      { id: '2', type: 'order', title: '蟹堡王下单', points: 15, time: '2026/11/16 11:12:08' },
+      { id: '3', type: 'login', title: '每日登录比奇堡', points: 10, time: '2026/11/16 10:31:02' },
+    ],
+  }))
+  location.replace(new URLSearchParams(location.search).get('to') || '/pineapple')
+</script>
+</body>
+</html>

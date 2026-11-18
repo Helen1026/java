@@ -73,3 +73,46 @@ INSERT INTO bb_order_item (order_id, item_id, icon, name, price, quantity) VALUE
 (2, 8, '🧋', '泡泡奶茶',      3.00, 1),
 -- 订单 3（已取消）
 (3, 7, '🍦', '海藻冰淇淋',    9.00, 1);
+
+-- -----------------------------
+-- 种子数据（补充）：近两周分散的演示订单
+--   日期相对当天（NOW() - INTERVAL n DAY），保证后台「数据概览」的
+--   近 14 天订单折线始终有走势可看；重复执行前请先重跑上方建表段。
+-- -----------------------------
+INSERT INTO bb_order (order_no, user_id, subtotal, tax_amount, total_amount, status, remark, create_time) VALUES
+('BB-DEMO-01', 1, 25.00, 1.25, 26.25, 1, '演示订单', NOW() - INTERVAL 13 DAY),
+('BB-DEMO-02', 2, 15.00, 0.75, 15.75, 2, '演示订单', NOW() - INTERVAL 13 DAY),
+('BB-DEMO-03', 1, 20.00, 1.00, 21.00, 1, '演示订单', NOW() - INTERVAL 11 DAY),
+('BB-DEMO-04', 3, 12.00, 0.60, 12.60, 1, '演示订单', NOW() - INTERVAL 10 DAY),
+('BB-DEMO-05', 1, 18.00, 0.90, 18.90, 1, '演示订单', NOW() - INTERVAL 10 DAY),
+('BB-DEMO-06', 2,  9.00, 0.45,  9.45, 0, '演示订单', NOW() - INTERVAL 10 DAY),
+('BB-DEMO-07', 1, 12.00, 0.60, 12.60, 1, '演示订单', NOW() - INTERVAL  8 DAY),
+('BB-DEMO-08', 3, 30.00, 1.50, 31.50, 1, '演示订单', NOW() - INTERVAL  6 DAY),
+('BB-DEMO-09', 1,  9.00, 0.45,  9.45, 2, '演示订单', NOW() - INTERVAL  6 DAY),
+('BB-DEMO-10', 2, 18.00, 0.90, 18.90, 0, '演示订单', NOW() - INTERVAL  5 DAY),
+('BB-DEMO-11', 1, 25.00, 1.25, 26.25, 1, '演示订单', NOW() - INTERVAL  3 DAY),
+('BB-DEMO-12', 3, 15.00, 0.75, 15.75, 1, '演示订单', NOW() - INTERVAL  3 DAY),
+('BB-DEMO-13', 1, 21.00, 1.05, 22.05, 0, '演示订单', NOW() - INTERVAL  2 DAY),
+('BB-DEMO-14', 2, 18.00, 0.90, 18.90, 1, '演示订单', NOW() - INTERVAL  1 DAY),
+('BB-DEMO-15', 1, 30.00, 1.50, 31.50, 1, '演示订单', NOW()),
+('BB-DEMO-16', 3, 12.00, 0.60, 12.60, 0, '演示订单', NOW());
+
+-- 明细快照（每张演示订单各挂一条商品，商品信息不参与概览统计）
+INSERT INTO bb_order_item (order_id, item_id, icon, name, price, quantity)
+SELECT o.id, 1, '🍔', '招牌蟹黄堡', 12.00, 1 FROM bb_order o WHERE o.order_no IN
+('BB-DEMO-01','BB-DEMO-03','BB-DEMO-05','BB-DEMO-07','BB-DEMO-11','BB-DEMO-15');
+INSERT INTO bb_order_item (order_id, item_id, icon, name, price, quantity)
+SELECT o.id, 2, '🍟', '海霸王薯条', 9.00, 1 FROM bb_order o WHERE o.order_no IN
+('BB-DEMO-02','BB-DEMO-04','BB-DEMO-06','BB-DEMO-09','BB-DEMO-13','BB-DEMO-16');
+INSERT INTO bb_order_item (order_id, item_id, icon, name, price, quantity)
+SELECT o.id, 8, '🧋', '泡泡奶茶', 3.00, 1 FROM bb_order o WHERE o.order_no IN
+('BB-DEMO-08','BB-DEMO-10','BB-DEMO-12','BB-DEMO-14');
+
+-- -----------------------------
+-- 种子数据（补充）：演示用户（让「数据概览」的新增用户折线有走势）
+--   密码哈希为随机值，仅供统计展示，不能用于登录；
+--   INSERT IGNORE 依赖 username 唯一键，重复执行脚本不会插入重复用户。
+-- -----------------------------
+INSERT IGNORE INTO sys_user (username, password, nickname, avatar, status, create_time, update_time) VALUES
+('patrick_demo',  SHA2('demo-no-login-1', 256), '派大星', NULL, 1, NOW() - INTERVAL 4 DAY, NOW() - INTERVAL 4 DAY),
+('squidward_demo', SHA2('demo-no-login-2', 256), '章鱼哥', NULL, 1, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);

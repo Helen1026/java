@@ -528,7 +528,8 @@ function logout() {
   padding: 12px 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  flex-wrap: nowrap;
+  gap: 10px;
 }
 
 .brand {
@@ -553,12 +554,13 @@ function logout() {
 .nav-links {
   flex: 1;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   justify-content: center;
+  white-space: nowrap;
 }
 .nav-link {
-  padding: 8px 14px;
+  padding: 8px 11px;
   border: none;
   border-radius: var(--r-pill);
   background: transparent;
@@ -582,7 +584,7 @@ function logout() {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   white-space: nowrap;
 }
 .user-chip {
@@ -759,21 +761,29 @@ function logout() {
   transform: translateY(-2px);
 }
 
-/* ===== 分级分类筛选 ===== */
+/* ===== 分级分类筛选（全部收在一条横排里，不换行） ===== */
 .category-filter {
   margin-top: 18px;
+  max-width: 100%;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  justify-content: safe center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none; /* Firefox 隐藏滚动条 */
 }
+.category-filter::-webkit-scrollbar { display: none; }
 .cat-label {
+  flex-shrink: 0;
   color: #E0F2FE;
   font-size: 13px;
   text-shadow: 0 2px 6px rgba(0, 0, 0, .2);
 }
 .cat-chip {
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: 6px 15px;
   border: 2px solid #7DD3FC;
   border-radius: var(--r-pill);
@@ -795,13 +805,11 @@ function logout() {
   border-color: #059669;
   box-shadow: 0 3px 0 #047857;
 }
+/* 子分类：跟顶层分类挤在同一条横排里，不再另起一行 */
 .sub-cats {
-  width: 100%;
-  margin-top: 2px;
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-flex;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: center;
   gap: 8px;
 }
 .cat-chip.sub {
@@ -1158,23 +1166,22 @@ function logout() {
 /* ===== 小屏适配 ===== */
 @media (max-width: 640px) {
   .nav-inner {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
     padding: 10px 14px;
+    overflow-x: auto; /* 小屏内容放不下时才允许滚动 */
+    scrollbar-width: none;
   }
+  .nav-inner::-webkit-scrollbar { display: none; }
   .nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
     flex-wrap: nowrap;
+    justify-content: flex-start;
+    white-space: nowrap;
   }
   .nav-right {
     margin-left: auto;
-    /* 多了积分胶囊后一行放不下，允许换行而不是撑出屏幕 */
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: flex-end;
-    row-gap: 6px;
   }
   .hero {
     padding-top: 36px;

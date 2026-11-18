@@ -67,3 +67,10 @@ export function updateCategory(id, category) {
 export function deleteCategory(id) {
   return request.delete(`/admin/category/${id}`)
 }
+
+/** ===== 数据概览统计（/api/admin/stats） =====
+ * 返回 { totals, orderTrend, userTrend, orderStatus, itemCategory }
+ */
+export function statsApi() {
+  return request.get('/admin/stats')
+}

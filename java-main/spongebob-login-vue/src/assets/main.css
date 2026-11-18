@@ -268,10 +268,11 @@ body {
 .seabed-nav-inner {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 12px 18px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  flex-wrap: nowrap;
+  gap: 8px;
 }
 .seabed-brand {
   display: flex;
@@ -300,7 +301,7 @@ body {
 /* 导航栏最左侧常驻「返回」按钮：解决子页面无返回入口的问题 */
 .seabed-back {
   flex-shrink: 0;
-  padding: 7px 12px;
+  padding: 7px 9px;
   border: 2px solid #7DD3FC;
   border-radius: var(--r-pill);
   background: rgba(255, 255, 255, .9);
@@ -316,12 +317,13 @@ body {
 .seabed-links {
   flex: 1;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-wrap: nowrap;
+  gap: 4px;
   justify-content: center;
+  white-space: nowrap;
 }
 .seabed-link {
-  padding: 8px 14px;
+  padding: 8px 9px;
   border: none;
   border-radius: var(--r-pill);
   background: transparent;
@@ -344,8 +346,28 @@ body {
 .seabed-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   white-space: nowrap;
+}
+/* 后台管理按钮（与首页导航同款，内页也有入口） */
+.btn-admin {
+  padding: 7px 12px;
+  border: 2px solid #34D399;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, #34D399, #059669);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #047857;
+  transition: transform .1s, box-shadow .1s, filter .2s;
+  white-space: nowrap;
+}
+.btn-admin:hover { filter: brightness(1.06); }
+.btn-admin:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #047857;
 }
 .seabed-chip {
   display: flex;
@@ -585,16 +607,17 @@ body {
 /* ===== 子页面小屏适配 ===== */
 @media (max-width: 640px) {
   .seabed-nav-inner {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
     padding: 10px 14px;
+    overflow-x: auto; /* 小屏内容放不下时才允许滚动 */
+    scrollbar-width: none;
   }
+  .seabed-nav-inner::-webkit-scrollbar { display: none; }
   .seabed-links {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
     flex-wrap: nowrap;
+    justify-content: flex-start;
+    white-space: nowrap;
   }
   .seabed-right { margin-left: auto; }
   .page-hero { padding-top: 26px; }

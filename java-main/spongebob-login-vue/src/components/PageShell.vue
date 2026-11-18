@@ -24,6 +24,7 @@
         <div class="seabed-right">
           <PointsChip />
           <CartButton />
+          <button class="btn-admin" @click="goAdmin">🔐 后台管理</button>
           <button class="seabed-chip" :title="`${profile.nickname} · 去菠萝屋改资料`" @click="go('/pineapple')">
             <UserAvatar :src="profile.avatar" :size="24" :ring="false" />
             <span>{{ profile.nickname }}</span>
@@ -63,6 +64,7 @@ import PointsChip from './PointsChip.vue'
 import SeaFooter from './SeaFooter.vue'
 import UserAvatar from './UserAvatar.vue'
 import { profile, loadProfile, clearProfile } from '../userProfile'
+import { openAdmin } from '../adminAccess'
 
 defineProps({
   /** 页面主标题 */
@@ -104,6 +106,11 @@ function back() {
   } else {
     router.push('/home')
   }
+}
+
+/** 点击后台管理：先确认当前账号权限，再决定进后台还是去管理员登录页 */
+function goAdmin() {
+  openAdmin(router)
 }
 
 function logout() {

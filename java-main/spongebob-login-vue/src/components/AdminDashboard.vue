@@ -37,6 +37,18 @@
           <h2 class="block-title">📊 数据概览</h2>
           <div class="stat-grid">
             <div class="stat-card">
+              <div class="stat-num">{{ stats.users }}</div>
+              <div class="stat-label">用户总数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">{{ stats.orders }}</div>
+              <div class="stat-label">订单总数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">¥{{ stats.revenue }}</div>
+              <div class="stat-label">已完成订单金额</div>
+            </div>
+            <div class="stat-card">
               <div class="stat-num">{{ stats.items }}</div>
               <div class="stat-label">条目总数</div>
             </div>
@@ -48,11 +60,29 @@
               <div class="stat-num">{{ stats.cats }}</div>
               <div class="stat-label">分类总数</div>
             </div>
-            <div class="stat-card">
-              <div class="stat-num">{{ stats.catsOn }}</div>
-              <div class="stat-label">已启用分类</div>
+          </div>
+
+          <!-- 图表区：折线图 + 饼图 -->
+          <div class="chart-grid">
+            <div class="chart-card wide">
+              <h3 class="chart-title">📈 近 14 天订单量与新增用户</h3>
+              <LineChart v-if="trendSeries.length" :series="trendSeries" />
+              <div v-else class="chart-empty">🫧 暂无趋势数据</div>
+            </div>
+
+            <div class="chart-card">
+              <h3 class="chart-title">🧾 订单状态分布</h3>
+              <PieChart v-if="orderStatusData.length" :data="orderStatusData" />
+              <div v-else class="chart-empty">🫧 还没有订单数据</div>
+            </div>
+
+            <div class="chart-card">
+              <h3 class="chart-title">🍔 商品分类分布</h3>
+              <PieChart v-if="itemCategoryData.length" :data="itemCategoryData" />
+              <div v-else class="chart-empty">🫧 还没有商品数据</div>
             </div>
           </div>
+
           <div class="quick">
             <button class="btn-sea" @click="menu = 'items'">管理首页条目 →</button>
             <button class="btn-amber" @click="menu = 'categories'">管理分类 →</button>
@@ -264,7 +294,10 @@ import { useRouter } from 'vue-router'
 import {
   adminProfileApi, listItems, createItem, updateItem, deleteItem,
   listCategories, createCategory, updateCategory, deleteCategory,
+  statsApi,
 } from '../api/admin'
+import LineChart from './LineChart.vue'
+import PieChart from './PieChart.vue'
 
 const router = useRouter()
 
@@ -295,13 +328,52 @@ const showCatModal = ref(false)
 const editingCat = ref(null)
 const catForm = reactive({ name: '', parentId: 0, sort: 0, status: 1 })
 
-/** 概览统计 */
-const stats = computed(() => ({
-  items: items.value.length,
-  itemsOn: items.value.filter((i) => i.status === 1).length,
-  cats: categories.value.length,
-  catsOn: categories.value.filter((c) => c.status === 1).length,
-}))
+/** 概览统计：来自后端 /api/admin/stats（用户 / 订单 / 商品 / 分类汇总 + 图表数据） */
+const statsRaw = ref(null)
+const stats = computed(() => {
+  const t = statsRaw.value?.totals || {}
+  return {
+    users: t.users ?? 0,
+    orders: t.orders ?? 0,
+    revenue: t.revenue ?? 0,
+    items: t.items ?? 0,
+    itemsOn: t.itemsOn ?? 0,
+    cats: t.categories ?? 0,
+  }
+})
+
+/** 折线图：近 14 天订单量与新增用户（两个系列，日期与 orderTrend 对齐） */
+const trendSeries = computed(() => {
+  const raw = statsRaw.value
+  if (!raw) return []
+  const t = raw.orderTrend || []
+  const u = raw.userTrend || []
+  if (!t.length) return []
+  return [
+    { name: '订单量', color: '#F59E0B', points: t.map((x) => ({ label: x.date, value: x.count })) },
+    { name: '新增用户', color: '#2DD4BF', points: t.map((x, i) => ({ label: x.date, value: u[i]?.count ?? 0 })) },
+  ]
+})
+
+/** 饼图：订单状态分布（全为 0 时不渲染） */
+const orderStatusData = computed(() => {
+  const list = statsRaw.value?.orderStatus || []
+  return list.filter((d) => (Number(d.value) || 0) > 0)
+})
+
+/** 饼图：商品按分类的数量分布 */
+const itemCategoryData = computed(() => statsRaw.value?.itemCategory || [])
+
+async function loadStats() {
+  try {
+    const res = await statsApi()
+    statsRaw.value = res.data || null
+  } catch (err) {
+    handleAuthError(err)
+    // 统计失败不阻塞后台其他功能，静默降级为空数据
+    statsRaw.value = null
+  }
+}
 
 /** 分类父级下拉：排除自身及后代，避免产生循环层级 */
 const parentOptions = computed(() => {
@@ -521,6 +593,7 @@ onMounted(() => {
   loadProfile()
   loadItems()
   loadCategories()
+  loadStats()
 })
 </script>
 
@@ -605,6 +678,38 @@ onMounted(() => {
 .stat-label { margin-top: 6px; font-size: 13px; color: #92400E; }
 .quick { margin-top: 22px; display: flex; gap: 12px; flex-wrap: wrap; }
 .tip { margin-top: 16px; font-size: 13px; color: #92400E; line-height: 1.9; }
+
+/* 图表区 */
+.chart-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.chart-card {
+  padding: 16px 18px;
+  background: rgba(255, 251, 235, .96);
+  border: 3px solid #FBBF24;
+  border-radius: 18px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .16);
+  min-width: 0;
+}
+.chart-card.wide { grid-column: 1 / -1; }
+.chart-title {
+  margin: 0 0 12px;
+  color: #7C2D12;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+.chart-empty {
+  padding: 34px 10px;
+  text-align: center;
+  color: #B45309;
+  font-size: 14px;
+}
+@media (max-width: 900px) {
+  .chart-grid { grid-template-columns: 1fr; }
+}
 
 /* 工具栏 */
 .toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }

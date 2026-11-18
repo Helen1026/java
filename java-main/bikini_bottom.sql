@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 16/11/2026 11:55:56
+ Date: 18/11/2026 09:56:41
 */
 
 SET NAMES utf8mb4;
@@ -37,14 +37,13 @@ CREATE TABLE `bb_cart`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_goods`(`user_id` ASC, `goods_key` ASC) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '比奇堡购物车（按用户持久化）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '比奇堡购物车（按用户持久化）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bb_cart
 -- ----------------------------
-INSERT INTO `bb_cart` VALUES (4, 1, 'krusty:1', 'krusty', 1, '招牌蟹黄堡', '🍔', '主食', 12.00, 2, '2026-11-16 11:53:44', '2026-11-16 11:53:44');
-INSERT INTO `bb_cart` VALUES (5, 1, 'krusty:7', 'krusty', 7, '海藻冰淇淋', '🍦', '甜点', 9.00, 1, '2026-11-16 11:53:45', '2026-11-16 11:53:45');
-INSERT INTO `bb_cart` VALUES (6, 1, 'home:12', 'home', 12, '水母网（首页商品）', '🪼', '工具', 0.00, 1, '2026-11-16 11:53:45', '2026-11-16 11:53:45');
+INSERT INTO `bb_cart` VALUES (13, 1, 'home:16', 'home', 16, '会唱歌的海螺', '🐚', '神奇', 0.00, 1, '2026-11-18 09:24:36', '2026-11-18 09:24:36');
+INSERT INTO `bb_cart` VALUES (14, 1, 'home:13', 'home', 13, '泡泡水', '🫧', '玩具', 0.00, 1, '2026-11-18 09:24:41', '2026-11-18 09:24:41');
 
 -- ----------------------------
 -- Table structure for bb_category
@@ -66,42 +65,42 @@ CREATE TABLE `bb_category`  (
 -- ----------------------------
 -- Records of bb_category
 -- ----------------------------
-INSERT INTO `bb_category` VALUES (1, '美食', 0, 1, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (2, '玩具', 0, 1, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (3, '宠物', 0, 1, 3, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (4, '工具', 0, 1, 4, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (5, '乐器', 0, 1, 5, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (6, '服饰', 0, 1, 6, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (7, '家居', 0, 1, 7, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (8, '书籍', 0, 1, 8, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (9, '美妆护理', 0, 1, 9, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (10, '科技数码', 0, 1, 10, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
+INSERT INTO `bb_category` VALUES (1, '美食', 0, 1, 1, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (2, '玩具', 0, 1, 2, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (3, '宠物', 0, 1, 3, 1, '2026-11-18 09:53:57', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (4, '工具', 0, 1, 4, 1, '2026-11-18 09:53:57', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (5, '乐器', 0, 1, 5, 1, '2026-11-18 09:53:57', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (6, '服饰', 0, 1, 6, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (7, '家居', 0, 1, 7, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (8, '书籍', 0, 1, 8, 1, '2026-11-18 09:53:57', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (9, '美妆护理', 0, 1, 9, 1, '2026-11-18 09:53:57', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (10, '科技数码', 0, 1, 10, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
 INSERT INTO `bb_category` VALUES (11, '蟹堡王美食', 1, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (12, '甜品冷饮', 1, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (13, '海之霸黑暗料理', 1, 2, 3, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (14, '生鲜食材', 0, 1, 11, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (15, '运动户外', 0, 1, 12, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
+INSERT INTO `bb_category` VALUES (14, '生鲜食材', 0, 1, 11, 1, '2026-11-18 09:53:57', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (15, '运动户外', 0, 1, 12, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
 INSERT INTO `bb_category` VALUES (21, '泡泡玩具', 2, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (22, '神奇小物', 2, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (23, '水母周边', 2, 2, 3, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (31, '蜗牛与伙伴', 3, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (32, '海洋生物', 3, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (41, '捕捞工具', 4, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (42, '清洁用品', 4, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (51, '管乐器', 5, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (52, '打击乐', 5, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
+INSERT INTO `bb_category` VALUES (31, '蜗牛与伙伴', 3, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (32, '海洋生物', 3, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (41, '捕捞工具', 4, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (42, '清洁用品', 4, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (51, '管乐器', 5, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (52, '打击乐', 5, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
 INSERT INTO `bb_category` VALUES (61, '日常穿搭', 6, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (62, '运动装备', 6, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (71, '菠萝屋装饰', 7, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (72, '厨房用品', 7, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (81, '漫画杂志', 8, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (82, '教科书', 8, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (91, '护肤', 9, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (92, '香氛', 9, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
+INSERT INTO `bb_category` VALUES (81, '漫画杂志', 8, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (82, '教科书', 8, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (91, '护肤', 9, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (92, '香氛', 9, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
 INSERT INTO `bb_category` VALUES (101, '智能设备', 10, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (102, '影音娱乐', 10, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (141, '蟹堡原料', 14, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
-INSERT INTO `bb_category` VALUES (142, '海产鲜货', 14, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
+INSERT INTO `bb_category` VALUES (141, '蟹堡原料', 14, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
+INSERT INTO `bb_category` VALUES (142, '海产鲜货', 14, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-18 09:53:57');
 INSERT INTO `bb_category` VALUES (151, '水上运动', 15, 2, 1, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 INSERT INTO `bb_category` VALUES (152, '健身器材', 15, 2, 2, 1, '2026-11-06 16:07:10', '2026-11-06 16:07:10');
 
@@ -213,6 +212,92 @@ INSERT INTO `bb_item` VALUES (82, '水母冲浪板', '🏄', '印着水母图案
 INSERT INTO `bb_item` VALUES (83, '浮潜呼吸管', '🤿', '看清水母田全貌', '运动', 1200, 151, 1, '2026-11-09 11:37:45', '2026-11-09 11:37:45');
 
 -- ----------------------------
+-- Table structure for bb_order
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_order`;
+CREATE TABLE `bb_order`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `order_no` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '订单号（唯一）',
+  `user_id` bigint NOT NULL COMMENT '下单用户ID（关联 sys_user.id）',
+  `subtotal` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '商品小计',
+  `tax_amount` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '海洋保护税（5%）',
+  `total_amount` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '订单合计金额',
+  `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态：0 待付款 1 已完成 2 已取消',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '订单备注',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '下单时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_order_no`(`order_no` ASC) USING BTREE,
+  INDEX `idx_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_status`(`status` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单主表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of bb_order
+-- ----------------------------
+INSERT INTO `bb_order` VALUES (1, 'BB20261116001', 1, 20.00, 1.00, 21.00, 1, '老顾客，多加一份海藻酱', '2026-11-18 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (2, 'BB20261116002', 1, 15.00, 0.75, 15.75, 0, '待付款：蟹黄堡套餐', '2026-11-18 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (3, 'BB20261116003', 1, 9.00, 0.45, 9.45, 2, '用户取消：暂时不饿了', '2026-11-18 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (4, 'BB-DEMO-01', 1, 25.00, 1.25, 26.25, 1, '演示订单', '2026-11-05 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (5, 'BB-DEMO-02', 2, 15.00, 0.75, 15.75, 2, '演示订单', '2026-11-05 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (6, 'BB-DEMO-03', 1, 20.00, 1.00, 21.00, 1, '演示订单', '2026-11-07 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (7, 'BB-DEMO-04', 3, 12.00, 0.60, 12.60, 1, '演示订单', '2026-11-08 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (8, 'BB-DEMO-05', 1, 18.00, 0.90, 18.90, 1, '演示订单', '2026-11-08 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (9, 'BB-DEMO-06', 2, 9.00, 0.45, 9.45, 0, '演示订单', '2026-11-08 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (10, 'BB-DEMO-07', 1, 12.00, 0.60, 12.60, 1, '演示订单', '2026-11-10 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (11, 'BB-DEMO-08', 3, 30.00, 1.50, 31.50, 1, '演示订单', '2026-11-12 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (12, 'BB-DEMO-09', 1, 9.00, 0.45, 9.45, 2, '演示订单', '2026-11-12 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (13, 'BB-DEMO-10', 2, 18.00, 0.90, 18.90, 0, '演示订单', '2026-11-13 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (14, 'BB-DEMO-11', 1, 25.00, 1.25, 26.25, 1, '演示订单', '2026-11-15 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (15, 'BB-DEMO-12', 3, 15.00, 0.75, 15.75, 1, '演示订单', '2026-11-15 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (16, 'BB-DEMO-13', 1, 21.00, 1.05, 22.05, 0, '演示订单', '2026-11-16 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (17, 'BB-DEMO-14', 2, 18.00, 0.90, 18.90, 1, '演示订单', '2026-11-17 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (18, 'BB-DEMO-15', 1, 30.00, 1.50, 31.50, 1, '演示订单', '2026-11-18 09:37:20', '2026-11-18 09:37:20');
+INSERT INTO `bb_order` VALUES (19, 'BB-DEMO-16', 3, 12.00, 0.60, 12.60, 0, '演示订单', '2026-11-18 09:37:20', '2026-11-18 09:37:20');
+
+-- ----------------------------
+-- Table structure for bb_order_item
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_order_item`;
+CREATE TABLE `bb_order_item`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `order_id` bigint NOT NULL COMMENT '所属订单ID（关联 bb_order.id）',
+  `item_id` bigint NULL DEFAULT NULL COMMENT '关联商品ID（关联 bb_item.id，可空）',
+  `icon` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '商品图标快照（emoji）',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商品名称快照',
+  `price` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '成交单价快照',
+  `quantity` int NOT NULL DEFAULT 1 COMMENT '购买数量',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_order`(`order_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单明细表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of bb_order_item
+-- ----------------------------
+INSERT INTO `bb_order_item` VALUES (1, 1, 1, '🍔', '招牌蟹黄堡', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (2, 1, 2, '🍟', '海霸王薯条', 8.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (3, 2, 1, '🍔', '蟹黄堡套餐', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (4, 2, 8, '🧋', '泡泡奶茶', 3.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (5, 3, 7, '🍦', '海藻冰淇淋', 9.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (6, 4, 1, '🍔', '招牌蟹黄堡', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (7, 6, 1, '🍔', '招牌蟹黄堡', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (8, 8, 1, '🍔', '招牌蟹黄堡', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (9, 10, 1, '🍔', '招牌蟹黄堡', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (10, 14, 1, '🍔', '招牌蟹黄堡', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (11, 18, 1, '🍔', '招牌蟹黄堡', 12.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (13, 5, 2, '🍟', '海霸王薯条', 9.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (14, 7, 2, '🍟', '海霸王薯条', 9.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (15, 9, 2, '🍟', '海霸王薯条', 9.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (16, 12, 2, '🍟', '海霸王薯条', 9.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (17, 16, 2, '🍟', '海霸王薯条', 9.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (18, 19, 2, '🍟', '海霸王薯条', 9.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (20, 11, 8, '🧋', '泡泡奶茶', 3.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (21, 13, 8, '🧋', '泡泡奶茶', 3.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (22, 15, 8, '🧋', '泡泡奶茶', 3.00, 1, '2026-11-18 09:37:20');
+INSERT INTO `bb_order_item` VALUES (23, 17, 8, '🧋', '泡泡奶茶', 3.00, 1, '2026-11-18 09:37:20');
+
+-- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
@@ -227,7 +312,7 @@ CREATE TABLE `sys_user`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user
@@ -235,5 +320,7 @@ CREATE TABLE `sys_user`  (
 INSERT INTO `sys_user` VALUES (1, 'spongebob', 'f969248d621bcded4a3582a1c3b17a71eedfefa9120c36ee3bd1957438cd55b9', '海绵宝宝', NULL, 1, '2026-10-14 08:33:31', '2026-10-14 08:33:31');
 INSERT INTO `sys_user` VALUES (2, '海绵宝宝', '1f3662ccb05ee4aefdb171ebf84907fbbc8173d181d83ad8ceb712278417a028', '海绵宝宝', NULL, 1, '2026-10-14 08:54:14', '2026-10-14 08:54:14');
 INSERT INTO `sys_user` VALUES (3, 'Aeln', 'd51cc1cc39409b846d6c4e5e877eac1f47cd89994178a42b3707c4e895f37467', 'Aeln', NULL, 1, '2026-11-16 10:43:27', '2026-11-16 10:43:27');
+INSERT INTO `sys_user` VALUES (5, 'patrick_demo', '421164e04048f3b4e52f238ec8d17152ae0ca0d10b0729252d442dcc68d61660', '派大星', NULL, 1, '2026-11-14 09:37:20', '2026-11-14 09:37:20');
+INSERT INTO `sys_user` VALUES (6, 'squidward_demo', '15c399532bf5e2bd67935dccfcc6559f84a6213b222cb705891d58578723544a', '章鱼哥', NULL, 1, '2026-11-17 09:37:20', '2026-11-17 09:37:20');
 
 SET FOREIGN_KEY_CHECKS = 1;
